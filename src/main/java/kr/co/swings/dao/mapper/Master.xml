@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.swings.master">
+	
+	<select id="selectTicketList" resultType="map">
+		SELECT TicketName,
+		 	   TicketPrice,
+			   TicketAttr,
+			   TicketPlayTime
+          FROM TicketMaster			   
+	</select>
+	
+	<insert id="insertTicket" parameterType="map">
+		INSERT INTO TicketMaster
+				 	(
+				 	 TicketName,
+					 TicketPrice,
+					 TicketAttr,
+					 TicketPlayTime)
+			 VALUES (
+			         #{ticketName},
+					 #{ticketPrice},
+					 #{ticketAttr},
+					 #{ticketPlayTime}
+			        )				     
+	</insert>
+	
+	<delete id="deleteTicket" parameterType="map">
+		DELETE
+		  FROM TicketMaster
+		 WHERE TicketName = #{ticketName},
+		 	   TicketPrice = #{ticketPrice},
+			   TicketPlayTime = #{ticketPlayTime}
+	</delete>
+	
+</mapper>

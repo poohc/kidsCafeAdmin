@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d %-5level [%thread] %X{req.cookie.userno} %X{req.remote.host} %X{req.request.uri} %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="java.sql.Connection" level="debug" />
+	<logger name="java.sql.Statement" level="info" />
+	<logger name="java.sql.PreparedStatement" level="debug" />
+	<logger name="java.sql.ResultSet" level="info" />
+	<logger name="org.springframework" level="info" />
+		
+	<!-- level : trace < debug < info <  warn < error -->		
+	<root level="debug">
+		<appender-ref ref="STDOUT" />
+	</root>
+	
+</configuration>

@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.swings.sales">
+
+	<select id="selectSalesInfo" parameterType="map" resultType="map">
+<!-- 		SELECT (SELECT LOCALNAME -->
+<!-- 		          FROM FRANCHISEEINFO -->
+<!-- 		         WHERE FRANCHISEENUM = B.FRANCHISEENUM) LOCAL_NAME,  -->
+<!--                B.FRANCHISEENUM, -->
+<!--                ISNULL(B.CARD,0) CARD, -->
+<!--                ISNULL(B.CASH_RECEIPT,0) CASH_RECEIPT, -->
+<!-- 		 	   ISNULL(B.CASH,0) CASH, -->
+<!-- 		 	   ISNULL(B.CARD,0) + ISNULL(B.CASH_RECEIPT,0) + ISNULL(B.CASH,0) TOTAL_PRICE -->
+<!--           FROM ( -->
+<!-- 			    SELECT FRANCHISEENUM, -->
+<!-- 				       CARD, -->
+<!-- 				 	   CASH_RECEIPT, -->
+<!-- 				 	   CASH -->
+<!-- 				  FROM ( -->
+<!-- 				 		SELECT FRANCHISEENUM, -->
+<!-- 						       CASE WHEN RS18 = 'Y' THEN 'CARD' -->
+<!-- 						            WHEN RS18 = 'N' THEN 'CASH_RECEIPT' -->
+<!-- 						            ELSE 'CASH' END AS RS18,  -->
+<!-- 						       SUM(CONVERT(INT, PRICE)) PRICE -->
+<!-- 						  FROM CARDOKDATAINFO -->
+<!-- 						 WHERE CANCEL = '0' -->
+<!-- 						   AND LEFT(DATE, 8) = #{today} -->
+<!-- 						   AND FRANCHISEENUM = #{franchiseNum} -->
+<!-- 					  GROUP BY FRANCHISEENUM, RS18 -->
+<!-- 				       ) A -->
+<!-- 				PIVOT(SUM(PRICE) FOR RS18 IN ([CARD],[CASH_RECEIPT], [CASH])) AS PVT -->
+<!-- 		       ) B -->
+		SELECT (SELECT LOCALNAME
+		          FROM FRANCHISEEINFO
+		         WHERE FRANCHISEENUM = B.FRANCHISEENUM) LOCAL_NAME, 
+               B.FRANCHISEENUM,
+               ISNULL(B.CARD,0) CARD,
+               ISNULL(B.CASH,0) CASH,
+		 	   ISNULL(B.CARD,0) + ISNULL(B.CASH,0) TOTAL_PRICE
+          FROM (
+			    SELECT FRANCHISEENUM,
+				       CARD,
+				 	   CASH
+				  FROM (
+				 		SELECT FRANCHISEENUM,
+						       CASE WHEN APPROVALKIND = '1' THEN 'CARD'
+						            WHEN APPROVALKIND = '0' THEN 'CASH'
+						            END AS RS18,
+						       SUM(CONVERT(INT, SUMPRICE)) PRICE
+						  FROM PAYMENTINFO
+						 WHERE CancelFlag = '0'
+						   AND LEFT(INDATE, 8) = #{today}
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+					  GROUP BY FRANCHISEENUM, APPROVALKIND
+				       ) A
+				PIVOT(SUM(PRICE) FOR RS18 IN ([CARD], [CASH])) AS PVT
+		       ) B
+	</select>
+	
+	<select id="selectVisitInfo" parameterType="map" resultType="map">
+		SELECT A.FRANCHISEENUM,
+		       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = A.FRANCHISEENUM) LOCAL_NAME,
+		       ISNULL(SUM(A.ADULT_COUNT),0) ADULT_SUM,
+		       ISNULL(SUM(A.KIDS_COUNT),0)  KIDS_SUM,
+		       ISNULL(SUM(A.GROUP_COUNT),0) GROUP_SUM,
+		       ISNULL(SUM(A.ADULT_COUNT),0) + ISNULL(SUM(A.KIDS_COUNT),0) + ISNULL(SUM(A.GROUP_COUNT),0) TOTAL_SUM
+		  FROM (
+				SELECT FRANCHISEENUM,
+				       CASE WHEN CHARINDEX('아동입장', GOODSNAME) > 0 THEN NUM 
+				            ELSE 0 END AS KIDS_COUNT,
+				       CASE WHEN CHARINDEX('성인입장', GOODSNAME) > 0 THEN NUM 
+				            ELSE 0 END AS ADULT_COUNT,
+				       CASE WHEN CHARINDEX('단체', GOODSNAME) > 0 THEN NUM 
+				            ELSE 0 END AS GROUP_COUNT     
+				  FROM GOODSSALEINFO
+				 WHERE CANCELFLAG = '0'
+		           AND LEFT(InDate, 8) = #{today}
+		           <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		           AND FRANCHISEENUM = #{franchiseNum}		  
+		           </if>
+		       ) A
+		GROUP BY A.FRANCHISEENUM
+		ORDER BY A.FRANCHISEENUM
+	</select>
+	
+	<select id="selectSnsVisitInfo" parameterType="map" resultType="map">
+<!-- 		SELECT A.FRANCHISEENUM, -->
+<!-- 		       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = A.FRANCHISEENUM) LOCAL_NAME, -->
+<!-- 		       SUM(A.HOLIDAY_KIDS_COUNT) HOLIDAY_KIDS_SUM, -->
+<!-- 		       SUM(A.HOLIDAY_ADULT_COUNT) HOLIDAY_ADULT_SUM, -->
+<!-- 		       SUM(A.WEEKDAY_KIDS_COUNT) WEEKDAY_KIDS_SUM, -->
+<!-- 		       SUM(A.WEEKDAY_ADULT_COUNT) WEEKDAY_ADULT_SUM -->
+<!-- 		  FROM ( -->
+<!-- 				SELECT FranchiseeNum, -->
+<!-- 				       CASE WHEN CHARINDEX('주말어린이', GOODSNAME) > 0 THEN NUM  -->
+<!-- 				            ELSE 0 END AS HOLIDAY_KIDS_COUNT, -->
+<!-- 				       CASE WHEN CHARINDEX('주말어른', GOODSNAME) > 0 THEN NUM  -->
+<!-- 				            ELSE 0 END AS HOLIDAY_ADULT_COUNT, -->
+<!-- 				       CASE WHEN CHARINDEX('평일어린이', GOODSNAME) > 0 THEN NUM  -->
+<!-- 				            ELSE 0 END AS WEEKDAY_KIDS_COUNT, -->
+<!-- 				       CASE WHEN CHARINDEX('평일어른', GOODSNAME) > 0 THEN NUM  -->
+<!-- 				            ELSE 0 END AS WEEKDAY_ADULT_COUNT      -->
+<!-- 				  FROM GOODSSALEINFO		   -->
+<!-- 				 WHERE CHARINDEX('*[소셜]',GOODSNAME) > 0 -->
+<!-- 				   AND LEFT(INDATE, 8) = #{today} -->
+<!-- 				   AND FRANCHISEENUM = #{franchiseNum} -->
+<!-- 		       ) A -->
+<!-- 		GROUP BY A.FRANCHISEENUM -->
+<!-- 		ORDER BY A.FRANCHISEENUM -->
+		
+		SELECT A.GOODSNAME,
+        	   CASE WHEN A.GOODSNAME = '*[소셜]주말어른' THEN '3500'
+                    WHEN A.GOODSNAME = '*[소셜]주말어린이' THEN '11500'
+                    WHEN A.GOODSNAME = '*[소셜]평일어른' THEN '3000'
+                    WHEN A.GOODSNAME = '*[소셜]평일어린이' THEN '9900'
+                    ELSE '11500' END AS TICKET_PRICE,       
+        	   A.CNT,
+               CASE WHEN A.GOODSNAME = '*[소셜]주말어른' THEN A.CNT * 3500
+                    WHEN A.GOODSNAME = '*[소셜]주말어린이' THEN A.CNT * 11500
+                    WHEN A.GOODSNAME = '*[소셜]평일어른' THEN A.CNT * 3000
+                    WHEN A.GOODSNAME = '*[소셜]평일어린이' THEN A.CNT * 9900
+                    ELSE A.CNT * 11500 END AS SNS_PRICE_SUM                  
+          FROM (
+				SELECT GOODSNAME, 
+				       SUM(NUM) CNT 
+				  FROM GOODSSALEINFO
+				 WHERE CHARINDEX('*[소셜]',GOODSNAME) > 0
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum} 
+				   </if>
+				   AND LEFT(INDATE, 8) = #{today}
+				   AND CANCELFLAG = '0'
+			  GROUP BY GOODSNAME
+	           ) A
+	</select>
+	
+	<select id="selectMultiTicketSalesInfo" parameterType="map" resultType="map">
+		SELECT A.NAME, 
+		       A.PRICE,
+		       A.CNT,
+		       A.PRICE * A.CNT TOTAL_SUM
+		  FROM (
+				SELECT NAME, 
+				       PRICE,
+				       (SELECT COUNT(*) 
+				          FROM GOODSSALEINFO 
+				         WHERE LEFT(INDATE, 8) = #{today}
+						   AND CANCELFLAG = '0'
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   AND GOODSKIND1 = '7' 
+						   AND GOODSKIND2 = '0') CNT 
+				  FROM MULTITICKET
+		  	   ) A
+	</select>
+	
+	<select id="selectCardSalesInfo" parameterType="map" resultType="map">
+		SELECT RS14 PGNAME,
+       		   SUM(CONVERT(INT, PRICE)) PRICE
+		  FROM CARDOKDATAINFO
+		 <where>
+		   <if test="cancel != null and (cancel eq 'Y'.toString())">	
+		   AND CANCEL = '1'
+		   </if>
+		   <if test="cancel != null and (cancel eq 'N'.toString())">
+		   AND CANCEL = '0'
+		   </if>
+		   AND LEFT(DATE, 8) = #{today}
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		   AND RS18 = 'Y'
+		 </where>
+	  GROUP BY RS14		   
+      ORDER BY PRICE DESC
+	</select>
+	
+	<select id="selectFoodSalesList" parameterType="map" resultType="map">
+		SELECT A.GOODSNAME,
+			   A.DANGA, 
+			   A.CNT, 
+			   A.TOTAL_SUM
+		  FROM (
+				SELECT GOODSNAME,
+				       DANGA, 
+				       SUM(NUM) CNT, 
+				       DANGA * SUM(NUM) TOTAL_SUM
+				  FROM GOODSSALEINFO
+				 WHERE LEFT(INDATE, 8) = #{today}
+				   AND CANCELFLAG = '0'
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum} 
+				   </if>
+				   AND GOODSKIND1 = '1'
+				   AND GOODSKIND2 = '0'
+			  GROUP BY GOODSNAME,
+			           DANGA
+      	       ) A
+      ORDER BY A.CNT DESC       	           
+	</select>
+	
+	<select id="selectBeverageSalesList" parameterType="map" resultType="map">
+		SELECT A.GOODSNAME,
+			   A.DANGA, 
+			   A.CNT, 
+			   A.TOTAL_SUM
+		  FROM (
+				SELECT GOODSNAME,
+				       DANGA, 
+				       SUM(NUM) CNT, 
+				       DANGA * SUM(NUM) TOTAL_SUM
+				  FROM GOODSSALEINFO
+				 WHERE LEFT(INDATE, 8) = #{today}
+				   AND CANCELFLAG = '0'
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum} 
+				   </if>
+				   AND GOODSKIND1 = '1'
+				   AND GOODSKIND2 = '1'
+			  GROUP BY GOODSNAME,
+			           DANGA
+      	       ) A
+      ORDER BY A.CNT DESC       	           
+	</select>
+	
+	<select id="selectSnackSalesList" parameterType="map" resultType="map">
+		SELECT A.GOODSNAME,
+			   A.DANGA, 
+			   A.CNT, 
+			   A.TOTAL_SUM
+		  FROM (
+				SELECT GOODSNAME,
+				       DANGA, 
+				       SUM(NUM) CNT, 
+				       DANGA * SUM(NUM) TOTAL_SUM
+				  FROM GOODSSALEINFO
+				 WHERE LEFT(INDATE, 8) = #{today}
+				   AND CANCELFLAG = '0'
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum} 
+				   </if>
+				   AND GOODSKIND1 = '1'
+				   AND GOODSKIND2 = '2'
+			  GROUP BY GOODSNAME,
+			           DANGA
+      	       ) A
+      ORDER BY A.CNT DESC       	           
+	</select>
+	
+	<select id="selectMdSalesList" parameterType="map" resultType="map">
+		SELECT A.GOODSNAME,
+			   A.DANGA, 
+			   A.CNT, 
+			   A.TOTAL_SUM
+		  FROM (
+				SELECT GOODSNAME,
+				       DANGA, 
+				       SUM(NUM) CNT, 
+				       DANGA * SUM(NUM) TOTAL_SUM
+				  FROM GOODSSALEINFO
+				 WHERE LEFT(INDATE, 8) = #{today}
+				   AND CANCELFLAG = '0'
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum} 
+				   </if>
+				   AND GOODSKIND1 = '3'
+				   AND GOODSKIND2 = '0'
+			  GROUP BY GOODSNAME,
+			           DANGA
+      	       ) A
+      ORDER BY A.CNT DESC       	           
+	</select>
+	
+	<select id="selectExitSalesInfo" parameterType="map" resultType="map">
+		SELECT GOODSNAME, 
+		       SUM(CONVERT(INT,PRICE)) TOTAL_SUM
+		  FROM GOODSSALEINFO
+		 WHERE LEFT(INDATE, 8) = #{today}
+		   AND CANCELFLAG = '0'
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   AND FRANCHISEENUM = #{franchiseNum} 
+		   </if>
+		   AND CHARINDEX('퇴장-추가',GOODSNAME) > 0
+		   AND DANGA != '0'
+		   AND PRICE != '0'
+	  GROUP BY GOODSNAME
+	</select>
+	
+	<select id="selectDiscountSalesInfo" parameterType="map" resultType="map">
+		SELECT CASE WHEN C.GOODSNAME LIKE '%직권%' THEN '직권할인'
+	                ELSE '이벤트할인' END AS DISCOUNT_TYPE,
+	           C.GOODSNAME,
+	           C.CNT,
+	           C.TOTAL_SUM
+		  FROM (
+				SELECT B.GOODSNAME,
+				       SUM(B.CNT) CNT ,
+				       SUM(B.DIS_SUM) TOTAL_SUM
+				  FROM (
+						SELECT A.GOODSNAME,
+						       COUNT(*) CNT ,
+						  	   COUNT(*) * (A.DANGA * -1) DIS_SUM
+						  FROM (        
+						SELECT GOODSNAME, DANGA
+						  FROM GOODSSALEINFO
+						 WHERE LEFT(INDATE, 8) = #{today}
+				   		   AND CANCELFLAG = '0'
+				   		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   		   AND FRANCHISEENUM = #{franchiseNum}  
+				   		   </if>
+						   AND CHARINDEX('직권할인',GOODSNAME) > 0
+						UNION ALL        
+						SELECT GOODSNAME, DANGA
+						  FROM GOODSSALEINFO
+						 WHERE LEFT(INDATE, 8) = #{today}
+				   		   AND CANCELFLAG = '0'
+				   		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   		   AND FRANCHISEENUM = #{franchiseNum} 
+				   		   </if>
+						   AND CHARINDEX('#',GOODSNAME) > 0
+						       ) A
+						GROUP BY A.GOODSNAME, A.DANGA
+				       ) B
+				GROUP BY B.GOODSNAME
+			   ) C
+	</select>
+	
+	<select id="selectMultiTicketUseInfo" parameterType="map" resultType="map">
+		SELECT GOODSNAME,
+	       	   SUM(NUM) CNT
+		  FROM GOODSSALEINFO
+		 WHERE LEFT(INDATE, 8) = #{today} 
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		   AND CANCELFLAG = '0'
+		   AND CHARINDEX('10회이용권',GOODSNAME) > 0	   		   
+	  GROUP BY GOODSNAME
+	</select>
+	
+	<select id="selectNotMemberGroupEnterInfo" parameterType="map" resultType="map">
+		SELECT NAME,
+	           GOODSNAME,
+	           SUM(CONVERT(INT,PRICE)) SUM_PRICE 
+	      FROM GOODSSALEINFO 
+	     WHERE GOODSKIND2 = 9
+  	       AND LEFT(INDATE, 8) = #{today}
+  	       <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())"> 
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		   AND CANCELFLAG = '0' 
+	  GROUP BY NAME, GOODSNAME
+	</select>	
+	
+	<select id="selectGroupEnterInfo" parameterType="map" resultType="map">
+		SELECT GOODSNAME,
+		       SUM(NUM) CNT
+		  FROM GOODSSALEINFO
+		 WHERE LEFT(INDATE, 8) = #{today}
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())"> 
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		   AND CANCELFLAG = '0' 
+		   AND CHARINDEX('[단체]',GOODSNAME) > 0
+	  GROUP BY GOODSNAME
+	</select>
+	
+	<select id="selectMonthSalesInfo" parameterType="map" resultType="map">
+		SELECT AA.YYYYMM,
+			   AA.LOCAL_NAME,	
+		       AA.ENTERENCE_FEE_SUM,
+			   AA.FANDB_FEE_SUM,
+		       AA.MD_FEE_SUM,
+		       AA.ENTERENCE_COUNT_SUM,
+	           B.CASH_SUM,
+	           C.CREDIT_CARD_SUM,
+	           AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM TOTAL_SUM
+	      FROM (
+			    SELECT A.YYYYMM,
+					   A.LOCAL_NAME,	
+					   A.FRANCHISEENUM,
+				       ISNULL(SUM(CONVERT(INT, A.ENTERENCE_FEE)), 0) ENTERENCE_FEE_SUM,
+					   ISNULL(SUM(CONVERT(INT, A.FANDB_FEE)), 0) FANDB_FEE_SUM,
+				       ISNULL(SUM(CONVERT(INT, A.MD_FEE)),0) MD_FEE_SUM,
+				       ISNULL(SUM(A.ENTERENCE_COUNT),0) ENTERENCE_COUNT_SUM
+				  FROM (
+						SELECT LEFT(INDATE, 6) YYYYMM,
+							   FRANCHISEENUM,
+						       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = GOODSSALEINFO.FRANCHISEENUM) LOCAL_NAME,
+						       CASE WHEN GOODSNAME = '*[소셜]주말어른' THEN NUM * 3500
+					                WHEN GOODSNAME = '*[소셜]주말어린이' THEN NUM * 11500
+					                WHEN GOODSNAME = '*[소셜]평일어른' THEN NUM * 3000
+					                WHEN GOODSNAME = '*[소셜]평일어린이' THEN NUM * 9900
+					                END AS ENTERENCE_FEE,
+						       CASE WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '0' THEN PRICE
+						            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '2' THEN PRICE
+						            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '1' THEN PRICE 
+						            END AS FANDB_FEE,
+						       CASE WHEN GOODSKIND1 = '3' AND GOODSKIND2 = '0' THEN PRICE
+						            END AS MD_FEE,				       
+							   CASE WHEN CHARINDEX('입장', GOODSNAME) > 0 THEN NUM
+							        END AS ENTERENCE_COUNT
+						  FROM GOODSSALEINFO
+						 WHERE CANCELFLAG = '0'
+						   AND LEFT(INDATE, 6) = #{yyyymm}
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+						   AND FRANCHISEENUM = #{selectFranchiseNum}
+						   </if>
+				       ) A
+				GROUP BY A.YYYYMM, A.FRANCHISEENUM, A.LOCAL_NAME
+				       ) AA,
+				       (
+				       SELECT  LEFT(INDATE,6) YYYYMM,
+						       FRANCHISEENUM,
+						       SUM(CONVERT(INT, SUMPRICE)) CASH_SUM
+						  FROM PAYMENTINFO 
+						 WHERE CANCELFLAG = '0' 
+						   AND LEFT(INDATE,6) = #{yyyymm}
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+						   AND FRANCHISEENUM = #{selectFranchiseNum}
+						   </if>
+						   AND APPROVALKIND = 0
+					  GROUP BY LEFT(INDATE,6), FRANCHISEENUM   
+				       ) B,
+				       (
+				       SELECT  LEFT(INDATE,6) YYYYMM,
+						       FRANCHISEENUM,
+						       SUM(CONVERT(INT, SUMPRICE)) CREDIT_CARD_SUM
+						  FROM PAYMENTINFO 
+						 WHERE CANCELFLAG = '0' 
+						   AND LEFT(INDATE,6) = #{yyyymm}
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+						   AND FRANCHISEENUM = #{selectFranchiseNum}
+						   </if>
+						   AND APPROVALKIND = 1
+					  GROUP BY LEFT(INDATE,6), FRANCHISEENUM   
+				       ) C
+         WHERE AA.YYYYMM = B.YYYYMM
+           AND B.YYYYMM = C.YYYYMM
+           AND AA.FRANCHISEENUM = B.FRANCHISEENUM
+           AND B.FRANCHISEENUM = C.FRANCHISEENUM
+	</select>
+	
+	<select id="selectMonthSalesListByDate" parameterType="map" resultType="map">
+		SELECT SUBSTRING(AA.YYYYMMDD,0,5) + '년' + SUBSTRING(AA.YYYYMMDD,5,2) + '월' + SUBSTRING(AA.YYYYMMDD,7,2) + '일' YYYYMMDD,
+		       AA.LOCAL_NAME,
+		       AA.ENTERENCE_FEE_SUM, 
+			   AA.FANDB_FEE_SUM,
+			   AA.MD_FEE_SUM,
+			   AA.ENTERENCE_COUNT_SUM,
+			   B.CASH_SUM,
+			   C.CREDIT_CARD_SUM,
+			   AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM TOTAL_SUM
+		  FROM (
+				SELECT A.YYYYMMDD,
+				       A.FRANCHISEENUM,
+				       A.LOCAL_NAME,
+				       ISNULL(SUM(CONVERT(INT, A.ENTERENCE_FEE)), 0) ENTERENCE_FEE_SUM,
+					   ISNULL(SUM(CONVERT(INT, A.FANDB_FEE)), 0) FANDB_FEE_SUM,
+				       ISNULL(SUM(CONVERT(INT, A.MD_FEE)),0) MD_FEE_SUM,
+				       ISNULL(SUM(A.ENTERENCE_COUNT),0) ENTERENCE_COUNT_SUM
+				  FROM (
+						SELECT LEFT(INDATE, 8) YYYYMMDD,
+						       FRANCHISEENUM,
+						       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = GOODSSALEINFO.FRANCHISEENUM) LOCAL_NAME,
+						       CASE WHEN GOODSNAME = '*[소셜]주말어른' THEN NUM * 3500
+					                WHEN GOODSNAME = '*[소셜]주말어린이' THEN NUM * 11500
+					                WHEN GOODSNAME = '*[소셜]평일어른' THEN NUM * 3000
+					                WHEN GOODSNAME = '*[소셜]평일어린이' THEN NUM * 9900
+					                END AS ENTERENCE_FEE,
+						       CASE WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '0' THEN PRICE
+						            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '2' THEN PRICE
+						            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '1' THEN PRICE 
+						            END AS FANDB_FEE,
+						       CASE WHEN GOODSKIND1 = '3' AND GOODSKIND2 = '0' THEN PRICE
+						            END AS MD_FEE,
+							   CASE WHEN CHARINDEX('입장', GOODSNAME) > 0 THEN NUM
+							        END AS ENTERENCE_COUNT
+						  FROM GOODSSALEINFO
+						 WHERE CANCELFLAG = '0'
+						   AND LEFT(INDATE, 8) BETWEEN #{startDate} AND #{endDate}
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+						   AND FRANCHISEENUM = #{selectFranchiseNum}
+						   </if>
+				       ) A
+				GROUP BY A.YYYYMMDD, A.FRANCHISEENUM, A.LOCAL_NAME
+		       ) AA,
+		       (
+				SELECT LEFT(INDATE,8) YYYYMMDD,
+				       FRANCHISEENUM,
+				       SUM(CONVERT(INT, SUMPRICE)) CASH_SUM
+				  FROM PAYMENTINFO 
+				 WHERE CANCELFLAG = '0' 
+				   AND LEFT(INDATE,8) BETWEEN #{startDate} AND #{endDate}
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum}
+				   </if>
+				   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+				   AND FRANCHISEENUM = #{selectFranchiseNum}
+				   </if>
+				   AND APPROVALKIND = 0
+			  GROUP BY LEFT(INDATE,8), FRANCHISEENUM    		       
+		       ) B,
+		       (
+				SELECT LEFT(INDATE,8) YYYYMMDD,
+				       FRANCHISEENUM,
+				       SUM(CONVERT(INT, SUMPRICE)) CREDIT_CARD_SUM
+				  FROM PAYMENTINFO 
+				 WHERE CANCELFLAG = '0' 
+				   AND LEFT(INDATE,8) BETWEEN #{startDate} AND #{endDate}
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum}
+				   </if>
+				   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+				   AND FRANCHISEENUM = #{selectFranchiseNum}
+				   </if>
+				   AND APPROVALKIND = 1
+			  GROUP BY LEFT(INDATE,8), FRANCHISEENUM    		       
+		       ) C
+		 WHERE AA.YYYYMMDD = B.YYYYMMDD
+		   AND B.YYYYMMDD = C.YYYYMMDD
+		   AND AA.FRANCHISEENUM = B.FRANCHISEENUM
+		   AND B.FRANCHISEENUM = C.FRANCHISEENUM
+	  ORDER BY AA.YYYYMMDD
+	</select>
+	
+	<select id="selectMonthSalesListByMonth" parameterType="map" resultType="map">
+		SELECT SUBSTRING(AA.YYYYMM,0,5) + '년' + SUBSTRING(AA.YYYYMM,5,2) + '월' YYYYMM,
+		       AA.LOCAL_NAME,
+		       AA.ENTERENCE_FEE_SUM, 
+			   AA.FANDB_FEE_SUM,
+			   AA.MD_FEE_SUM,
+			   AA.ENTERENCE_COUNT_SUM,
+			   B.CASH_SUM,
+			   C.CREDIT_CARD_SUM,
+			   AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM TOTAL_SUM
+		  FROM (
+				SELECT A.YYYYMM,
+				       A.FRANCHISEENUM,
+				       A.LOCAL_NAME,
+				       ISNULL(SUM(CONVERT(INT, A.ENTERENCE_FEE)), 0) ENTERENCE_FEE_SUM,
+					   ISNULL(SUM(CONVERT(INT, A.FANDB_FEE)), 0) FANDB_FEE_SUM,
+				       ISNULL(SUM(CONVERT(INT, A.MD_FEE)),0) MD_FEE_SUM,
+				       ISNULL(SUM(A.ENTERENCE_COUNT),0) ENTERENCE_COUNT_SUM
+				  FROM (
+						SELECT LEFT(INDATE, 6) YYYYMM,
+						       FRANCHISEENUM,
+						       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = GOODSSALEINFO.FRANCHISEENUM) LOCAL_NAME,
+						       CASE WHEN GOODSNAME = '*[소셜]주말어른' THEN NUM * 3500
+					                WHEN GOODSNAME = '*[소셜]주말어린이' THEN NUM * 11500
+					                WHEN GOODSNAME = '*[소셜]평일어른' THEN NUM * 3000
+					                WHEN GOODSNAME = '*[소셜]평일어린이' THEN NUM * 9900
+					                END AS ENTERENCE_FEE,
+						       CASE WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '0' THEN PRICE
+						            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '2' THEN PRICE
+						            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '1' THEN PRICE 
+						            END AS FANDB_FEE,
+						       CASE WHEN GOODSKIND1 = '3' AND GOODSKIND2 = '0' THEN PRICE
+						            END AS MD_FEE,
+							   CASE WHEN CHARINDEX('입장', GOODSNAME) > 0 THEN NUM
+							        END AS ENTERENCE_COUNT
+						  FROM GOODSSALEINFO
+						 WHERE CANCELFLAG = '0'
+						   AND LEFT(INDATE, 6) BETWEEN #{startDate} AND #{endDate}
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+						   AND FRANCHISEENUM = #{selectFranchiseNum}
+						   </if>
+				       ) A
+				GROUP BY A.YYYYMM, A.FRANCHISEENUM, A.LOCAL_NAME
+		       ) AA,
+		       (
+				SELECT LEFT(INDATE,6) YYYYMM,
+				       FRANCHISEENUM,
+				       SUM(CONVERT(INT, SUMPRICE)) CASH_SUM
+				  FROM PAYMENTINFO 
+				 WHERE CANCELFLAG = '0' 
+				   AND LEFT(INDATE,6) BETWEEN #{startDate} AND #{endDate}
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum}
+				   </if>
+				   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+				   AND FRANCHISEENUM = #{selectFranchiseNum}
+				   </if>
+				   AND APPROVALKIND = 0
+			  GROUP BY LEFT(INDATE,6), FRANCHISEENUM    		       
+		       ) B,
+		       (
+				SELECT LEFT(INDATE,6) YYYYMM,
+				       FRANCHISEENUM,
+				       SUM(CONVERT(INT, SUMPRICE)) CREDIT_CARD_SUM
+				  FROM PAYMENTINFO 
+				 WHERE CANCELFLAG = '0' 
+				   AND LEFT(INDATE,6) BETWEEN #{startDate} AND #{endDate}
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FRANCHISEENUM = #{franchiseNum}
+				   </if>
+				   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+				   AND FRANCHISEENUM = #{selectFranchiseNum}
+				   </if>
+				   AND APPROVALKIND = 1
+			  GROUP BY LEFT(INDATE,6), FRANCHISEENUM    		       
+		       ) c
+		 WHERE AA.YYYYMM = B.YYYYMM
+		   AND B.YYYYMM = C.YYYYMM
+		   AND AA.FRANCHISEENUM = B.FRANCHISEENUM
+		   AND B.FRANCHISEENUM = C.FRANCHISEENUM
+	  ORDER BY AA.YYYYMM	   
+	</select>
+	
+	<select id="selectFranchiseInfo" parameterType="map" resultType="map">
+		SELECT LocalName,
+			   FaseName,
+			   BusinessNumber,
+			   Address,
+			   BusinessPaper,
+			   MasterName,
+			   MasterEmail,
+			   Phone,
+			   MasterPhone,
+			   JoinDate,
+			   Royalty,
+			   VANName,
+			   VANNum,
+			   FranchiseeNum,
+			   MasterPassword,
+			   FranchiseeStatus
+          FROM FranchiseeInfo			   
+	</select>
+	
+	<select id="selectPayList" parameterType="map" resultType="map">
+	   	SELECT LEFT(DATE,8) INDATE,
+		       SUBSTRING(LEFT(DATE,8), 0, 5) + '년' + SUBSTRING(LEFT(DATE,8), 5, 2) + '월' + SUBSTRING(LEFT(DATE,8), 7, 2) + '일' YYYYMMDD,
+		       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEENUM = CARDOKDATAINFO.FRANCHISEENUM) LOCAL_NAME,
+		       MCODE,
+		       NAME,
+		       PRICE,
+		       CASE WHEN CANCEL = '0' THEN '승인'
+				            WHEN CANCEL = '1' THEN '취소'
+				            WHEN CANCEL = '2' THEN '직권취소'
+				            ELSE '기타' END AS CONFIRM_TYPE,
+		       CASE WHEN RS18 = 'Y' THEN '신용카드'
+		            ELSE '현금' END AS KINDS_OF_PAY,
+		       RS09 APPROVALNUM,
+		       RS12 PG_NAME
+		  FROM CARDOKDATAINFO
+		<where>
+		   CONTACTNUM != ''
+		   <if test="franchiseNum != null and franchiseNum != ''">	
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		   AND PRICE != '0'
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+			   <if test="franchiseNum != null and franchiseNum != ''">
+			   AND FRANCHISEENUM = #{franchiseNum}
+			   </if>
+		   </if>
+		   <if test="searchDate != null and searchDate != ''">
+		   AND LEFT(DATE,8) = #{searchDate} 
+		   </if>
+		   <if test="radioSearch != null and (radioSearch eq 'confirm'.toString())">
+		   AND CANCEL = '0'
+		   </if>
+		   <if test="radioSearch != null and (radioSearch eq 'cancel'.toString())">
+		   AND CANCEL = '1'
+		   </if>	   
+		   <if test="radioSearch != null and (radioSearch eq 'customCancel'.toString())">
+		   AND CANCEL = '2'
+		   </if>
+		   <if test="searchKeyword != null and searchKeyword != ''">
+	       AND (MCODE LIKE  '%' + #{searchKeyword} + '%'  OR NAME LIKE '%' + #{searchKeyword} + '%')
+	       </if>
+		</where>
+	</select>
+	
+	<update id="updateCardOkDataInfo" parameterType="map">
+		UPDATE CARDOKDATAINFO 
+		   SET CANCEL = #{cancel} 
+		 WHERE RS09 = #{approvalNum}
+	</update>
+	
+	<update id="updateGoodsSaleInfo" parameterType="map">
+		UPDATE GOODSSALEINFO 
+		   SET CANCELFLAG = #{cancel} 
+		 WHERE APPROVALNUM = #{approvalNum}
+	</update>
+	
+	<update id="updatePaymentInfo" parameterType="map">
+		UPDATE PAYMENTINFO 
+		   SET CANCELFLAG = #{cancel} 
+		 WHERE APPROVALNUM = #{approvalNum}
+	</update>	 
+	
+</mapper>

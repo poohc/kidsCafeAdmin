@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.swings.member">
+	
+	<select id="selectFranchiseList" resultType="map">
+		SELECT LocalName,
+			   FaseName,
+			   BusinessNumber,
+			   Address,
+			   BusinessPaper,
+			   MasterName,
+			   MasterEmail,
+			   Phone,
+			   MasterPhone,
+			   JoinDate,
+			   Royalty,
+			   VANName,
+			   VANNum,
+			   FranchiseeNum,
+			   MasterPassword,
+			   FranchiseeStatus
+		  FROM FranchiseeInfo	
+	</select>
+	
+	<select id="selectMasterInfoCount" parameterType="kr.co.swings.vo.PagingVo" resultType="int">
+		SELECT COUNT(*)
+ 		  FROM MASTERINFO
+          <where>
+          	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">	
+	          	  <if test="franchiseNum != null and franchiseNum != ''">
+	          	  AND FranchiseeNum = #{franchiseNum}
+	          	  </if>	
+          	  </if>
+          	  <if test="searchKeyword != null and searchKeyword != ''">
+		      AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
+		      </if>
+		      <if test="searchMonth != null and (searchMonth eq '3m'.toString())">
+		      	  AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		      	  AND EntFranchiseeCode = #{franchiseNum}
+		      	  </if>
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+			      	  AND EntFranchiseeCode IN
+			      	  <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+	                   #{item}
+	                  </foreach>
+		      	  </if>
+		      </if>
+		      <if test="searchMonth != null and (searchMonth eq '6m'.toString())">
+		      	  AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-6, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		      	  AND EntFranchiseeCode = #{franchiseNum}
+		      	  </if>
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+			      	  AND EntFranchiseeCode IN
+			      	  <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+	                   #{item}
+	                  </foreach>
+		      	  </if>
+		      </if>
+		      <if test="searchMonth != null and (searchMonth eq '12m'.toString())">
+		      	  AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-12, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		      	  AND EntFranchiseeCode = #{franchiseNum}
+		      	  </if>
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+			      	  AND EntFranchiseeCode IN
+			      	  <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+	                   #{item}
+	                  </foreach>
+		      	  </if>
+		      </if>
+	      </where>  
+	</select>
+	
+	<select id="selectMasterInfoList" parameterType="kr.co.swings.vo.PagingVo" resultType="map">
+		SELECT MCode,
+			   Name,
+			   Num,
+			   Status,
+			   ID,
+			   Password,
+			   LastVisit,
+			   Point,
+			   DisNum,
+			   QRCode,
+			   Phone,
+			   Birth,
+			   Adult,
+			   AdultNum,
+			   ChildNum,
+			   JoinDate,
+			   Address,
+			   EntFlag,
+			   EntTime,
+			   ExtTime,
+			   EntNumber,
+			   Memo,
+			   Picture1,
+			   Picture2,
+			   Picture3,
+			   Picture4,
+			   Picture5,
+			   Withdraw,
+			   WithdrawDate,
+			   WithdrawMemo,
+			   FranchiseeNum,
+			   FranchiseeCode,
+			   EntFranchiseeCode,
+			   Coupon1,
+			   Coupon2,
+			   Coupon3,
+			   SpecialMan,
+			   AgreeFlag,
+			   TermsFlag,
+			   AgreeDate,
+			   Photo,
+			   CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum)
+			 	    WHEN A.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+               CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.EntFranchiseeCode) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.EntFranchiseeCode)
+			 	    ELSE '슈퍼윙즈키즈카페' END AS lastVisitFname			        
+ 		  FROM (
+                SELECT ROW_NUMBER() OVER(ORDER BY JOINDATE DESC) AS ROW_NUM,
+                       *
+                  FROM MASTERINFO
+                <where>
+                	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		                <if test="franchiseNum != null and franchiseNum != ''">
+			            AND FranchiseeNum = #{franchiseNum}
+			            </if>	
+		            </if>
+		            <if test="searchKeyword != null and searchKeyword != ''">
+				    AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
+				    </if>
+				    <if test="searchMonth != null and (searchMonth eq '3m'.toString())">
+			      	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+			      	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+			      	AND EntFranchiseeCode = #{franchiseNum}
+			      	</if>
+			      	<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+					    AND EntFranchiseeCode IN
+					    <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+			            #{item}
+			            </foreach>
+			      	</if>
+			        </if>
+			        <if test="searchMonth != null and (searchMonth eq '6m'.toString())">
+			        	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-6, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+			        	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+			        	AND EntFranchiseeCode = #{franchiseNum}
+			        	</if>
+			        	<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+				        	AND EntFranchiseeCode IN
+				        	<foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+		                    #{item}
+		                    </foreach>
+			        	</if>
+			       </if>
+			       <if test="searchMonth != null and (searchMonth eq '12m'.toString())">
+			       AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-12, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+				       <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				       AND EntFranchiseeCode = #{franchiseNum}
+				       </if>
+				       <if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+					   	   AND EntFranchiseeCode IN
+					       <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+			               #{item}
+			               </foreach>
+				       </if>
+			       </if>
+                </where> 
+			   ) AS A
+        <where> 
+           <if test="pageCount != null and pageCount != ''">
+           AND ROW_NUM BETWEEN ((#{currentPage} - 1) * #{pageCount} + 1) AND (#{currentPage} * #{pageCount})
+           </if>
+		</where>
+	</select>
+	
+	<select id="selectMasterInfoExcelList" parameterType="kr.co.swings.vo.PagingVo" resultType="map">
+		SELECT Name,
+		       MCode,
+		       JoinDate,
+		       Phone,
+		       Num,
+		       CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum)
+			 	    WHEN A.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+		       LastVisit,
+		       CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.EntFranchiseeCode) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.EntFranchiseeCode)
+			 	    ELSE '슈퍼윙즈키즈카페' END AS lastVisitFname       			        
+ 		  FROM (
+                SELECT ROW_NUMBER() OVER(ORDER BY JOINDATE DESC) AS ROW_NUM,
+                       *
+                  FROM MASTERINFO
+                <where>
+	                <if test="franchiseNum != null and franchiseNum != ''">
+		            AND FranchiseeNum = #{franchiseNum}
+		            </if>	
+		            <if test="searchKeyword != null and searchKeyword != ''">
+				    AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
+				    </if>
+                </where>
+			   ) AS A
+        <where> 
+           <if test="pageCount != null and pageCount != ''">
+           AND ROW_NUM BETWEEN ((#{currentPage} - 1) * #{pageCount} + 1) AND (#{currentPage} * #{pageCount})
+           </if>
+		</where>
+	</select>
+	
+	<select id="selectSearchMasterInfoExcelList" parameterType="kr.co.swings.vo.PagingVo" resultType="map">
+		SELECT Name,
+		       MCode,
+		       JoinDate,
+		       Phone,
+		       Num,
+		       CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum)
+			 	    WHEN A.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+		       LastVisit,
+		       CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.EntFranchiseeCode) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.EntFranchiseeCode)
+			 	    ELSE '슈퍼윙즈키즈카페' END AS lastVisitFname,
+			   CASE WHEN EntFlag = '1' THEN 'O'
+			        ELSE 'X' END AS EntFlag,
+			   CASE WHEN AgreeFlag = '1' THEN 'O'
+			        ELSE 'X' END AS AgreeFlag 	           			        
+ 		  FROM (
+                SELECT ROW_NUMBER() OVER(ORDER BY JOINDATE DESC) AS ROW_NUM,
+                       *
+                  FROM MASTERINFO
+				 <where>
+	                <if test="franchiseNum != null and franchiseNum != ''">
+		            AND FranchiseeNum = #{franchiseNum}
+		            </if>	
+		            <if test="searchKeyword != null and searchKeyword != ''">
+				    AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
+				    </if>
+                 </where>                  
+			   ) AS A
+        <where> 
+           <if test="pageCount != null and pageCount != ''">
+           AND ROW_NUM BETWEEN ((#{currentPage} - 1) * #{pageCount} + 1) AND (#{currentPage} * #{pageCount})
+           </if>
+		</where>
+	</select>
+	
+	<select id="selectMemberInfo" parameterType="map" resultType="map">
+		SELECT MCode,
+			   Name,
+			   Num,
+			   Status,
+			   ID,
+			   Password,
+			   LastVisit,
+			   Point,
+			   replace( convert( VARCHAR, convert( MONEY, Point ), 1 ), '.00', '' ) cPoint,
+			   DisNum,
+			   QRCode,
+			   Phone,
+			   Birth,
+			   Adult,
+			   AdultNum,
+			   ChildNum,
+			   JoinDate,
+			   Address,
+			   EntFlag,
+			   EntTime,
+			   ExtTime,
+			   EntNumber,
+			   Memo,
+			   Picture1,
+			   Picture2,
+			   Picture3,
+			   Picture4,
+			   Picture5,
+			   Withdraw,
+			   WithdrawDate,
+			   WithdrawMemo,
+			   FranchiseeNum,
+			   FranchiseeCode,
+			   EntFranchiseeCode,
+			   Coupon1,
+			   Coupon2,
+			   Coupon3,
+			   SpecialMan,
+			   AgreeFlag,
+			   TermsFlag,
+			   AgreeDate,
+			   Photo,
+			   CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = MASTERINFO.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = MASTERINFO.FranchiseeNum)
+			 	    WHEN MASTERINFO.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+               CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = MASTERINFO.EntFranchiseeCode) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = MASTERINFO.EntFranchiseeCode)
+			 	    ELSE '슈퍼윙즈키즈카페' END AS lastVisitFname			        
+ 		  FROM MASTERINFO
+         WHERE MCode = #{mCode}
+	</select>
+	
+	<select id="selectMemberFamilyInfo" parameterType="map" resultType="map">
+		SELECT MCode,
+			   MFlag,
+			   Name,
+			   QRCode,
+			   Status,
+			   ID,
+			   Password,
+			   Phone,
+			   Birth,
+			   Adult,
+			   JoinDate,
+			   Address,
+			   EntFlag,
+			   EntTime,
+			   ExtTime,
+			   EntKindName,
+			   EntPrice,
+			   EntNumber,
+			   Memo,
+			   Picture1,
+			   Picture2,
+			   Picture3,
+			   Picture4,
+			   Picture5,
+			   Facility01,
+			   Facility02,
+			   Facility03,
+			   Facility04,
+			   Facility05,
+			   Facility06,
+			   Facility07,
+			   Facility08,
+			   Facility09,
+			   Facility10,
+			   Facility11,
+			   Facility12,
+			   Facility13,
+			   Facility14,
+			   Facility15,
+			   Facility16,
+			   Facility17,
+			   Facility18,
+			   Facility19,
+			   Facility20,
+			   EntFranchiseCode,
+			   FranchiseeNum,
+			   FranchiseeCode,
+			   LastVisit,
+			   own		        
+ 		  FROM MEMBERINFO
+         WHERE Phone = #{phone}
+	</select>
+			
+	<select id="selectStoreVisitInfo" parameterType="map" resultType="map">
+		SELECT TOP 3 
+		       InDate,
+		       CONVERT (DATE, InDate) cIndate,
+		       FranchiseeNum,
+		       CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = VisitInfo.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = VisitInfo.FranchiseeNum)
+			 	    ELSE '슈퍼윙즈키즈카페' END AS fName,
+			   replace( convert( VARCHAR, convert( MONEY, Price ), 1 ), '.00', '' ) cPrice,
+		       Price
+		  FROM VisitInfo 
+		 WHERE MCode = #{mCode} 
+      ORDER BY InDate DESC	
+	</select>
+	
+	<select id="selectStoreUseInfo" parameterType="map" resultType="map">
+		SELECT LEFT(INDATE, 8) INDATE,
+		       SUBSTRING(INDATE, 0, 5) + '년' + SUBSTRING(INDATE, 5, 2) + '월' + SUBSTRING(INDATE, 7, 2) + '일' YYYYMMDD,
+		       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = GOODSSALEINFO.FRANCHISEENUM) LOCAL_NAME,
+		       MCODE,
+		       NAME,
+		       CASE WHEN GOODSKIND1 = '0' AND GOODSKIND2 = '0' THEN '입장요금'
+		            WHEN GOODSKIND1 = '2' AND GOODSKIND2 = '0' THEN '퇴장요금'
+		            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '0' THEN '푸드판매'
+		            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '2' THEN '스낵'
+		            WHEN GOODSKIND1 = '3' AND GOODSKIND2 = '0' THEN 'MD상품'
+		            WHEN GOODSKIND1 = '1' AND GOODSKIND2 = '1' THEN '커피/음료'
+		            WHEN GOODSKIND1 = '0' AND GOODSKIND2 = '6' THEN '직권할인 내역'
+		            WHEN GOODSKIND1 = '0' AND GOODSKIND2 = '3' THEN '입장시 할인내역'
+		            WHEN GOODSKIND1 = '7' AND GOODSKIND2 = '0' THEN '다회권'
+		            ELSE '기타' END AS KINDS_OF_SALES,
+		       PRICE,
+		       REPLACE( CONVERT( VARCHAR, CONVERT( MONEY, PRICE ), 1 ), '.00', '' ) CPRICE,
+		       CASE WHEN CANCELFLAG = '0' THEN '승인'
+		            WHEN CANCELFLAG = '1' THEN '취소'
+		            WHEN CANCELFLAG = '2' THEN '직권취소'
+		            ELSE '기타' END AS CONFIRM_TYPE,
+		       (SELECT CASE WHEN APPROVALKIND = '0' THEN '현금'
+		                    WHEN APPROVALKIND = '1' THEN '신용카드' 
+		                    ELSE '기타' END
+		         FROM PAYMENTINFO 
+		        WHERE PAYMENTINFO.APPROVALNUM = GOODSSALEINFO.APPROVALNUM) KINDS_OF_PAY,
+		        APPROVALNUM,		   
+		        QRCODE,
+                GOODSNAME,          
+		        CASE WHEN NAME = '비회원' THEN '비회원카드'
+		             ELSE (SELECT CASE WHEN ISNULL(A.RS14,'0') = '0' THEN '현금'
+		                               WHEN ISNULL(A.RS14,'0') != '0' THEN A.RS14
+		                               ELSE '기타' END
+				             FROM CARDOKDATAINFO A
+				            WHERE CONTACTNUM != ''
+				              AND A.CANCEL = '0'
+				              AND A.CONTACTNUM = GOODSSALEINFO.CONTACTNUM
+				              AND A.ENTNUMBER = GOODSSALEINFO.ENTNUMBER) END AS PG_NAME
+		  FROM GOODSSALEINFO
+         WHERE MCode = #{mCode}
+           AND (   GOODSKIND1 = '0' AND GOODSKIND2 = '0'
+                OR GOODSKIND1 = '1' AND GOODSKIND2 = '0'
+                OR GOODSKIND1 = '1' AND GOODSKIND2 = '2'
+                OR GOODSKIND1 = '3' AND GOODSKIND2 = '0'
+                OR GOODSKIND1 = '1' AND GOODSKIND2 = '1'
+                OR GOODSKIND1 = '7' AND GOODSKIND2 = '0')
+	</select>
+	
+	<select id="selectMultiTicketList" parameterType="map" resultType="map">
+		SELECT USERNAME,
+			   MCODE,
+			   NAME,
+			   LEFT(DATETIME, 8) INDATE,
+			   (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = MULTITICKETSALESUSE.FRANCHISEENUM) LOCAL_NAME,
+			   BUYUSE,
+			   MKINDCODE,
+			   NUM,
+			   BALANCE,
+			   LASTFLAG,
+			   RESERVED1,
+			   RESERVED2,
+			   RESERVED3
+		  FROM MULTITICKETSALESUSE
+		 WHERE MCODE = #{mCode}
+	</select>
+	
+	<update id="updateMasterInfo" parameterType="map">
+		UPDATE MASTERINFO
+		   SET  PHONE = #{phone}
+		       ,AGREEFLAG = #{agreeFlag}
+		       ,TERMSFLAG = #{termsFlag}
+		       <if test="termsFlag != null and (termsFlag eq '1'.toString())">
+		       ,AGREEDATE = GETDATE()
+		       </if>
+		       <if test="termsFlag != null and (termsFlag eq '0'.toString())">
+		       ,AGREEDATE = NULL
+		       </if>
+		       ,NAME = #{name}
+		 WHERE MCODE = #{mCode}
+	</update>
+	
+	<insert id="insertMemberInfo" parameterType="map">
+    	INSERT INTO MemberInfo
+			(
+			    Name,
+			    MCode,
+			    EntFlag,
+			    MFlag,
+			    JoinDate, 
+			    QRCode,
+			    Adult,
+			    Phone,
+			    Password,
+			    FranchiseeNum,
+	    		FranchiseeCode   
+			)
+			VALUES
+			(
+			    #{Name},
+			    #{MCode},
+			    '0',
+			    #{MFlag},
+			    Convert(CHAR(8), Getdate(), 112),
+			    #{QRCode},
+			    #{Adult},
+			    #{Phone},
+			    #{Password},
+			    '9999999',
+			    '9999999'
+			)
+	</insert>
+	
+	<delete id="deleteMemberInfo" parameterType="map">
+		DELETE
+		  FROM MemberInfo
+		 WHERE PHONE = #{phone}
+		   <if test="mflag != null and mflag != ''">
+		   AND MFLAG = 0
+		   </if>		   
+	</delete>
+	
+	<delete id="deleteMasterInfoByMemberOut" parameterType="map">
+		DELETE
+		  FROM MasterInfo
+		 WHERE PHONE = #{phone}
+	</delete>
+	
+	<delete id="deleteMultiticketSalesUse" parameterType="map">
+		DELETE
+		  FROM MultiTicketSalesUse
+		 WHERE MCode = #{MCode}
+	</delete>
+	
+	<select id="deleteMemberAvailable" parameterType="map" resultType="map">
+		SELECT MFLAG
+		  FROM MemberInfo
+		 WHERE QRCODE = #{qrCode} 
+	</select>
+	
+	<update id="pointInfoUpdate" parameterType="map">
+		UPDATE MasterInfo
+		   SET Point = #{point}
+		 WHERE MCode = #{mCode} 
+	</update>
+					
+</mapper>

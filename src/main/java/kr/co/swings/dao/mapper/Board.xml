@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.swings.board">
+	
+	<select id="selectRequestBoardCount" resultType="int">
+		SELECT COUNT(*)
+		  FROM RequestBoard
+		 <where>
+		 	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+			 	<if test="franchiseNum != null and franchiseNum != ''">
+	         	AND FranchiseeNum = #{franchiseNum}
+	        	</if>
+        	</if>
+		 </where> 
+	</select>
+	
+	<select id="selectRequestBoardList" parameterType="kr.co.swings.vo.PagingVo" resultType="map">
+		SELECT IndexNo,
+		       ReceptionNo,
+			   CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = A.FranchiseeNum)
+			 	    WHEN A.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+			   Title,
+			   Contents,
+			   TelNo,
+			   ReceptionDate,
+			   ProcessingDate,
+			   RegDate,
+			   UpdDate,
+			   ProcessingResult,
+			   Etc 
+ 		  FROM (
+                SELECT ROW_NUMBER() OVER(ORDER BY RegDate DESC) AS ROW_NUM,
+                       *
+                  FROM RequestBoard
+                  <where>
+                  	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+					 	<if test="franchiseNum != null and franchiseNum != ''">
+			         	AND FranchiseeNum = #{franchiseNum}
+			        	</if>
+		        	</if>
+				  </where>
+			   ) AS A
+        <where> 
+           <if test="pageCount != null and pageCount != ''">
+           AND ROW_NUM BETWEEN ((#{currentPage} - 1) * #{pageCount} + 1) AND (#{currentPage} * #{pageCount})
+           </if>
+		</where>
+	</select>
+	
+	<select id="selectRequestBoardInfo" parameterType="map" resultType="map">
+		SELECT IndexNo,
+		       ReceptionNo,
+			   CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = RequestBoard.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = RequestBoard.FranchiseeNum)
+			 	    WHEN RequestBoard.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+			   Title,
+			   Contents,
+			   TelNo,
+			   ReceptionDate,
+			   ProcessingDate,
+			   RegDate,
+			   UpdDate,
+			   ProcessingResult,
+			   Etc
+	      FROM RequestBoard
+	     WHERE IndexNo = #{indexNo}
+	</select>
+	
+	<select id="selectReceptionNo" parameterType="map" resultType="int">
+		SELECT ISNULL(MAX(ReceptionNo), 1) + 1 ReceptionNo
+	  	  FROM RequestBoard
+	   <where>
+	   	  <if test="franchiseNum != null and franchiseNum != ''">
+          AND FranchiseeNum = #{franchiseNum}
+       	  </if>
+	   </where>
+	</select>
+	
+	<insert id="insertRequestBoard" parameterType="map">
+		INSERT INTO RequestBoard
+					            (
+					             FranchiseeNum,
+								 Title,
+								 Contents,
+								 TelNo,
+								 ReceptionDate,
+								 ReceptionNo,
+								 RegDate
+					            )
+					     VALUES (
+					     		 #{FranchiseeNum},
+								 #{Title},
+								 #{Contents},
+								 #{TelNo},
+								 CONVERT(CHAR(8), GETDATE(), 112),
+								 #{ReceptionNo},
+								 GETDATE()
+					            )         
+	</insert>
+	
+	<update id="updateRequestBoard" parameterType="map">
+		UPDATE RequestBoard
+		   SET ProcessingResult = #{processingResult},
+		       ProcessingDate = CONVERT(CHAR(8), GETDATE(), 112),
+		       Etc = #{etc},
+		       UpdDate = GETDATE()
+		 WHERE IndexNo = #{indexNo}
+	</update>
+	
+	<delete id="deleteRequestBoard" parameterType="map">
+		DELETE
+		  FROM RequestBoard
+		 WHERE IndexNo = #{indexNo} 
+	</delete>
+	
+	<select id="selectNoticeBoardCount" resultType="int">
+		SELECT COUNT(*)
+		  FROM NoticeBoard
+	</select>
+	
+	<select id="selectNoticeBoardList" parameterType="kr.co.swings.vo.PagingVo" resultType="map">
+		SELECT NoticeId,
+			   PostDate,
+			   Title,
+			   Contents,
+			   Manager,
+			   RegDate,
+			   UpdDate 
+ 		  FROM (
+                SELECT ROW_NUMBER() OVER(ORDER BY RegDate DESC) AS ROW_NUM,
+                       *
+                  FROM NoticeBoard
+			   ) AS A
+        <where> 
+           <if test="pageCount != null and pageCount != ''">
+           AND ROW_NUM BETWEEN ((#{currentPage} - 1) * #{pageCount} + 1) AND (#{currentPage} * #{pageCount})
+           </if>
+		</where>
+	</select>
+	
+	<select id="selectNoticeBoardInfo" parameterType="map" resultType="map">
+		SELECT NoticeId,
+			   PostDate,
+			   Title,
+			   Contents,
+			   Manager,
+			   RegDate,
+			   UpdDate 
+ 		  FROM NoticeBoard
+         WHERE NoticeId = #{noticeId}
+	</select>
+	
+	<insert id="insertNoticeBoard" parameterType="map">
+		INSERT INTO NoticeBoard
+					            (
+					             PostDate,
+							     Title,
+							     Contents,
+							     Manager,
+							     RegDate 
+					            )
+					     VALUES (
+					     		 #{postDate},
+								 #{title},
+								 #{contents},
+								 #{manager},
+								 GETDATE()
+					            )         
+	</insert>
+	
+	<update id="updateNoticeBoard" parameterType="map">
+		UPDATE NoticeBoard
+		   SET PostDate = #{postDate},
+			   Title = #{title},
+			   Contents = #{contents},
+			   Manager = #{manager},
+			   UpdDate = GETDATE()
+		 WHERE NoticeId = #{noticeId}
+	</update>
+	
+	<delete id="deleteNoticeBoard" parameterType="map">
+		DELETE
+		  FROM NoticeBoard
+		 WHERE NoticeId = #{noticeId} 
+	</delete>
+	
+	<select id="selectNoticeBoardListLimitTen" resultType="map">
+		SELECT TOP 10
+		       NoticeId,
+			   PostDate,
+			   Title,
+			   Contents,
+			   Manager,
+			   RegDate,
+			   UpdDate 
+ 		  FROM NoticeBoard
+ 	  ORDER BY RegDate DESC
+	</select>
+		
+	<select id="selectRequestBoardListLimitTen" parameterType="map" resultType="map">
+		SELECT TOP 10
+		       IndexNo,
+		       ReceptionNo,
+			   CASE WHEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = RequestBoard.FranchiseeNum) != '' THEN (SELECT LocalName FROM FranchiseeInfo WHERE FranchiseeNum = RequestBoard.FranchiseeNum)
+			 	    WHEN RequestBoard.FranchiseeNum = '8888888' THEN '모바일'
+			        ELSE '슈퍼윙즈키즈카페' END AS fName,
+			   Title,
+			   Contents,
+			   TelNo,
+			   ReceptionDate,
+			   ProcessingDate,
+			   RegDate,
+			   UpdDate,
+			   ProcessingResult,
+			   Etc 
+ 		  FROM RequestBoard
+ 		 <where>
+ 		   <if test="franchiseNum != null and franchiseNum != ''">
+ 		   AND FranchiseeNum = #{franchiseNum} 
+ 		   </if>
+ 		 </where>   
+      ORDER BY RegDate DESC 		  
+	</select>	
+		
+</mapper>
