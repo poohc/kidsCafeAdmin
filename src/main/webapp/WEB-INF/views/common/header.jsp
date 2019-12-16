@@ -51,7 +51,7 @@ function logout(){
 		data : {},
 		success : function(result) {
 			if (result.resultCode == '00') {
-				location.replace('/login/login.view');
+				location.replace('${pageContext.request.contextPath}/login/login.view');
 			} else {
 				alert('로그아웃에 실패했습니다. 관리자에게 문의하여 주세요.');
 			}
