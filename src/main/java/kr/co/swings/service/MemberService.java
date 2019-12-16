@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.json.simple.JSONObject;
@@ -80,6 +81,9 @@ public class MemberService {
 		
 		if(totalCount > 0) {
 			pageSb = PagingUtil.createPaging(pagingVo, totalCount);
+			if("sms".equals(ObjectUtils.toString(request.getParameter("sms"), ""))) {
+				pagingVo.setPageCount(totalCount);
+			}
 			List<Map<String, Object>> memberList = memberDao.selectMasterInfoList(pagingVo);
 			request.setAttribute("pagingTag", pageSb);
 			request.setAttribute("memberList", memberList);			
@@ -252,6 +256,42 @@ public class MemberService {
 				result.put("resultCode", CommonConstants.RESULT_SUCCESS);
 			}
 		}
+		return result;
+	}
+	
+	/**
+	 * SMS 전송내역 보관
+	 * @param paramMap
+	 * @return
+	 */
+	public JSONObject insertSmsSendHistory(Map<String, Object> paramMap) {
+		JSONObject result = new JSONObject();
+		result.put("resultCode", CommonConstants.RESULT_FAIL);
+		result.put("resultMessage", "SMS 전송 내역 보관에 실패했습니다.");
+		
+		if(memberDao.insertSmsSendHistory(paramMap) > 0) {
+			result.put("resultCode", CommonConstants.RESULT_SUCCESS);
+			result.put("resultMessage", "SMS 전송 내역을 보관했습니다.");
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 카카오톡 전송내역 보관
+	 * @param paramMap
+	 * @return
+	 */
+	public JSONObject insertSendKakaoHistory(Map<String, Object> paramMap) {
+		JSONObject result = new JSONObject();
+		result.put("resultCode", CommonConstants.RESULT_FAIL);
+		result.put("resultMessage", "카카오톡 전송 내역 보관에 실패했습니다.");
+		
+		if(memberDao.insertSendKakaoHistory(paramMap) > 0) {
+			result.put("resultCode", CommonConstants.RESULT_SUCCESS);
+			result.put("resultMessage", "카카오톡 전송 내역을 보관했습니다.");
+		}
+		
 		return result;
 	}
 	

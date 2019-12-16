@@ -6,6 +6,7 @@
 <html>
 <head>
 <jsp:include page="../common/header.jsp" />
+<jsp:include page="../common/boardHeader.jsp" />
 <script type="text/javascript">
 	
 </script>
@@ -145,14 +146,14 @@
 									<c:when test="${not empty requestList}">
 									<c:forEach items="${requestList}" var="requestList">
 										<tr>
-											<td>${requestList.ReceptionDate}</td>
-											<td>${requestList.ReceptionNo}</td>
-											<td>${requestList.fName}</td>
-											<td>${requestList.Title}</td>
-											<td>${requestList.Contents}</td>
-											<td>${requestList.TelNo}</td>
-											<td>${requestList.ProcessingDate}</td>
-											<td>${requestList.ProcessingResult}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.ReceptionDate}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.ReceptionNo}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.fName}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.Title}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.Contents}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.TelNo}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.ProcessingDate}</td>
+											<td class="cur" onClick="openRequestProcessingPopup('${requestList.IndexNo}');">${requestList.ProcessingResult}</td>
 										</tr>
 									</c:forEach>
 									</c:when>
@@ -171,7 +172,7 @@
 					<div class="inBox right">
 						<div class="dfTable">
 							<div class="tit_info2">
-								<h3>지점별 매출현황</h3>
+								<h3>공지사항</h3>
 							</div>
 							<table>
 								<colgroup>
@@ -193,10 +194,10 @@
 									<c:when test="${not empty noticeList}">
 									<c:forEach items="${noticeList}" var="noticeList">
 									<tr>
-										<td>${noticeList.PostDate}</td>
-										<td>${noticeList.NoticeId}</td>
-										<td>${noticeList.Title}</td>
-										<td>${noticeList.Manager}</td>
+										<td class="cur" onClick="openNoticeUpdatePopup('${noticeList.NoticeId}');">${noticeList.PostDate}</td>
+										<td class="cur" onClick="openNoticeUpdatePopup('${noticeList.NoticeId}');">${noticeList.NoticeId}</td>
+										<td class="cur" onClick="openNoticeUpdatePopup('${noticeList.NoticeId}');">${noticeList.Title}</td>
+										<td class="cur" onClick="openNoticeUpdatePopup('${noticeList.NoticeId}');">${noticeList.Manager}</td>
 									</tr>
 									</c:forEach>
 									</c:when>

@@ -101,4 +101,15 @@ public class MemberDao {
 	public int deleteMultiticketSalesUse(Map<String, Object> param){
 		return sqlSession.delete(NS + "deleteMultiticketSalesUse", param);
 	}
+	
+	//SMS전송내역 INSERT
+	public int insertSmsSendHistory(Map<String, Object> param) {
+		return sqlSession.insert(NS + "insertSmsSendHistory", param); 
+	}
+	
+	//카카오톡 전송내역 INSERT
+	public int insertSendKakaoHistory(Map<String, Object> param) {
+		return sqlSession.insert(NS + "insertSendKakaoHistory", param); 
+	}
+	
 }

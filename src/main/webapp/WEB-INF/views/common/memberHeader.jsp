@@ -320,4 +320,14 @@ function openMemberPointUpdatePopup(mCode, phone){
 	window.open('${pageContext.request.contextPath}/member/memberPointUpdatePopup.view?mCode='+mCode+'&phone='+phone, popupTitle,  'width=765,height=300,toolbar=0,location=0, directories=0, status=0, menubar=0');
 }
 
+function openMemberSmsSendPopup(){
+	var popupTitle = "memberSmsSendPopup" ;
+	window.open('${pageContext.request.contextPath}/member/memberSmsSendPopup.view?franchiseNum='+$('#franchiseNum').val()+'&searchKeyword='+$('#searchKeyword').val()+'&searchMonth='+$('#searchMonth').val()+'&sms=sms', popupTitle, 'width=765,height=450,toolbar=0,location=0, directories=0, status=0, menubar=0');
+}
+
+function openMemberSmsSendPopup(){
+	var popupTitle = "memberNoticeTalkSendPopup" ;
+	window.open('${pageContext.request.contextPath}/member/memberNoticeTalkSendPopup.view?franchiseNum='+$('#franchiseNum').val()+'&searchKeyword='+$('#searchKeyword').val()+'&searchMonth='+$('#searchMonth').val()+'&sms=sms', popupTitle, 'width=765,height=750,toolbar=0,location=0, directories=0, status=0, menubar=0');
+}
+
 </script>

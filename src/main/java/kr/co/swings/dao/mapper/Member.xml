@@ -513,5 +513,35 @@
 		   SET Point = #{point}
 		 WHERE MCode = #{mCode} 
 	</update>
+	
+	<insert id="insertSmsSendHistory" parameterType="map">
+		INSERT INTO SendSmsHistory(
+								   FranchiseeNum,
+								   SmsSendCount,
+								   LmsSendCount,
+								   RegDate
+								  )
+						   VALUES (
+						   		   #{franchiseNum},
+						   		   #{smsSendCount},
+						   		   #{lmsSendCount},
+						   		   GETDATE()	
+						   		  ) 							  
+	</insert>
+	
+	<insert id="insertSendKakaoHistory" parameterType="map">
+		INSERT INTO SendKakaoHistory(
+								   FranchiseeNum,
+								   KakaoTalkSendCount,
+								   Type,
+								   RegDate
+								  )
+						   VALUES (
+						   		   #{franchiseNum},
+						   		   #{kakaoTalkSendCount},
+						   		   #{type},
+						   		   GETDATE()	
+						   		  ) 							  
+	</insert>
 					
 </mapper>

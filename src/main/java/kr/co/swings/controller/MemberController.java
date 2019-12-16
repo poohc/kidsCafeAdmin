@@ -105,6 +105,34 @@ public class MemberController {
 	}
 	
 	/**
+	 * SMS 전송 팝업 오픈
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "memberSmsSendPopup.view", method = {RequestMethod.GET, RequestMethod.POST})
+	public ModelAndView memberSmsSendPopup(PagingVo pagingVo, HttpServletRequest request, HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView();
+		memberService.selectMemberList(pagingVo, request);
+		mav.setViewName("/member/memberSmsSendPopup");
+		return mav;
+	}
+	
+	/**
+	 * 카카오 알림톡 전송 팝업 오픈
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "memberNoticeTalkSendPopup.view", method = {RequestMethod.GET, RequestMethod.POST})
+	public ModelAndView memberNoticeTalkSendPopup(PagingVo pagingVo, HttpServletRequest request, HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView();
+		memberService.selectMemberList(pagingVo, request);
+		mav.setViewName("/member/memberNoticeTalkSendPopup");
+		return mav;
+	}
+	
+	/**
 	 * 회원정보 업데이트
 	 * @param paramMap
 	 * @return
@@ -170,11 +198,42 @@ public class MemberController {
 		return result;
 	}
 	
+	/**
+	 * 회원탈퇴
+	 * @param paramMap
+	 * @return
+	 */
 	@RequestMapping(value = "memberSignOut.json", method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
 	public JSONObject memberSignOutProcess(@RequestParam Map<String, Object> paramMap) {
 		JSONObject result = new JSONObject();
 		result = memberService.memberSignOutProcess(paramMap);
+		return result;
+	}
+	
+	/**
+	 * SMS 전송건수 보관
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "insertSmsSendHistory.json", method = {RequestMethod.GET, RequestMethod.POST})
+	@ResponseBody
+	public JSONObject insertSmsSendHistory(@RequestParam Map<String, Object> paramMap) {
+		JSONObject result = new JSONObject();
+		result = memberService.insertSmsSendHistory(paramMap);
+		return result;
+	}
+	
+	/**
+	 * 카카오톡 전송건수 보관
+	 * @param paramMap
+	 * @return
+	 */
+	@RequestMapping(value = "insertSendKakaoHistory.json", method = {RequestMethod.GET, RequestMethod.POST})
+	@ResponseBody
+	public JSONObject insertSendKakaoHistory(@RequestParam Map<String, Object> paramMap) {
+		JSONObject result = new JSONObject();
+		result = memberService.insertSendKakaoHistory(paramMap);
 		return result;
 	}
 	
