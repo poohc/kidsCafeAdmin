@@ -68,7 +68,7 @@
 							<tr>
 								<td>
 									<dl>
-										<dt>현재입장회원</dt>
+										<dt>TODAY 매장방문회원</dt>
 										<dd id="memerEntCnt">
 											<fmt:formatNumber value="${dashBoardViewInfo.ENT_MEMBER}" pattern="#,###" />
 										</dd>

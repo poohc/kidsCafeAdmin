@@ -179,9 +179,9 @@ public class MemberController {
 	 */
 	@RequestMapping(value = "pointInfoUpdate.json", method = {RequestMethod.GET, RequestMethod.POST})
 	@ResponseBody
-	public JSONObject pointInfoUpdate(@RequestParam Map<String, Object> paramMap) {
+	public JSONObject pointInfoUpdate(@RequestParam Map<String, Object> paramMap, HttpServletRequest request) {
 		JSONObject result = new JSONObject();
-		result = memberService.pointInfoUpdate(paramMap);
+		result = memberService.pointInfoUpdate(paramMap, request);
 		return result;
 	}
 	

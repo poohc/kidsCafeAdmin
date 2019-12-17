@@ -510,9 +510,39 @@
 	
 	<update id="pointInfoUpdate" parameterType="map">
 		UPDATE MasterInfo
-		   SET Point = #{point}
+		   <set>
+		   <if test="addMinus != null and (addMinus eq '0'.toString())">
+		   Point = CONVERT(INT, Point) - CONVERT(INT, #{point})
+		   </if>
+		   <if test="addMinus != null and (addMinus eq '1'.toString())">
+		   Point = CONVERT(INT, Point) + CONVERT(INT, #{point})
+		   </if>
+		   </set>
 		 WHERE MCode = #{mCode} 
 	</update>
+	
+	<insert id="insertPointHits" parameterType="map">
+		INSERT INTO PointHis(
+							 MCode,
+							 AddMinus,
+							 Point,
+							 DateTime,
+							 Satff,
+							 Comment,
+							 device,
+							 FranchiseeNum						
+							)
+					 VALUES (
+					 		 #{mCode},
+					 		 #{addMinus},
+					 		 #{point},
+					 		 GETDATE(),
+					 		 #{staff},
+					 		 #{comment},
+					 		 #{device},
+					 		 #{franchiseNum}					 		 
+					 		)		
+	</insert>
 	
 	<insert id="insertSmsSendHistory" parameterType="map">
 		INSERT INTO SendSmsHistory(

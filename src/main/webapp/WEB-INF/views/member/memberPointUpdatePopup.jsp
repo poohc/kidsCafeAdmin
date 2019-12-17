@@ -28,11 +28,34 @@
 					</colgroup>
 					<tbody>
 						<input type="hidden" id="mCode" name="mCode" value="${memberInfo.MCode}">
+						<input type="hidden" id="point" name="point" value="${memberInfo.Point}">
 						<tr>
 							<th>누적포인트</th>
 							<td class="tl" colspan="3">
-								<input class="tc" type="number" id="totalPoint" name="totalPoint" value="${memberInfo.Point}">
-							</td>
+								${memberInfo.Point}
+							</td>							
+						</tr>
+						<tr>
+							<th>적립/차감 포인트</th>
+							<td class="tl" colspan="3">
+								<select id="addMinus" name="addMinus">
+									<option value="1">적립</option>
+									<option value="0">차감</option>
+								</select>
+								<input type="text" id="updatePoint" name="updatePoint">
+							</td>							
+						</tr>
+						<tr>
+							<th>스탭</th>
+							<td class="tl" colspan="3">
+								<input type="text" id="staff" name="staff">
+							</td>							
+						</tr>
+						<tr>
+							<th>코멘트</th>
+							<td class="tl" colspan="3">
+								<input type="text" id="comment" name="comment">
+							</td>							
 						</tr>
 					</tbody>
 				</table>

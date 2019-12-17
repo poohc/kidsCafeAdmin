@@ -14,6 +14,8 @@ $(document).ready(function(){
 		
 		if($('#searchText').val().length > 0){
 			$('#searchKeyword').val($('#searchText').val());	
+		} else {
+			$('#searchKeyword').val('');
 		}
 		movePage($('#currentPage').val());
 	});
@@ -67,39 +69,93 @@ $(document).ready(function(){
 						alert(result.resultMessage);
 						return;
 					}
+				},
+				error : function(error){
+					alert('회원정보 업데이트 중 오류가 발생했습니다. 관리자에게 문의하여 주세요.');
+					return;
 				}
 			});
 		}
 		
 	});
 	
+	$('input[name="updatePoint"]').keyup(function(e) {
+		reg = /[^0-9]/gi;
+        v = $(this).val();
+        if (reg.test(v)) {
+            $(this).val(v.replace(reg, ''));
+            $(this).focus();
+        }
+	});
+	
 	$('#memberPointUpdate').click(function(){
-		if($('#totalPoint').val().length == 0){
-			alert('포인트 정보를 입력해주세요.');
-			$('#totalPoint').focus();
+		
+		var flag = 'true';
+		
+		var type = '적립';
+		if($('#addMinus').val() == 0){
+			type = '차감';
+		}
+		
+		if($('#updatePoint').val().length == 0){
+			alert(type + ' 포인트 정보를 입력해주세요.');
+			$('#updatePoint').focus();
+			flag = 'false';
 			return;
 		}
 		
-		if(confirm('포인트 정보를 업데이트 하시겠습니까?')){
-			
-			$.ajax({
-				url : "${pageContext.request.contextPath}/member/pointInfoUpdate.json",
-				type : "POST",
-				data : {
-					mCode : $('#mCode').val(),
-					point : $('#totalPoint').val()
-				},
-				success : function(result) {
-					if (result.resultCode == '00') {
-						alert(result.resultMessage);
-						opener.parent.memberDetail($('#mCode').val(), $('#phone').val());
-						window.close();
-					} else {
-						alert(result.resultMessage);
+		if(type == '차감'){
+			//차감할 포인트가 누적 포인트 보다 클 경우
+			if(parseInt($('#updatePoint').val()) > parseInt($('#point').val())){
+				alert(type + ' 포인트는 누적포인트보다 클 수 없습니다.');
+				$('#updatePoint').val('');	
+				flag = 'false';
+			}
+		}
+		
+		if($('#staff').val().length == 0){
+			alert(type + ' 스탭명을 입력해 주세요.');
+			$('#staff').focus();
+			flag = 'false';
+			return;
+		}
+		
+		if($('#comment').val().length == 0){
+			alert(type + ' 메모를 입력해주세요.');
+			$('#comment').focus();
+			flag = 'false';
+			return;
+		}
+		
+		if(flag == 'true'){
+			if(confirm('포인트 정보를 업데이트 하시겠습니까?')){
+				
+				$.ajax({
+					url : "${pageContext.request.contextPath}/member/pointInfoUpdate.json",
+					type : "POST",
+					data : {
+						mCode : $('#mCode').val(),
+						point : $('#updatePoint').val(),
+						staff : $('#staff').val(),
+						comment : $('#comment').val(),
+						addMinus : $('#addMinus').val()
+					},
+					success : function(result) {
+						if (result.resultCode == '00') {
+							alert(result.resultMessage);
+							opener.parent.memberDetail($('#mCode').val(), $('#phone').val());
+							window.close();
+						} else {
+							alert(result.resultMessage);
+							return;
+						}
+					},
+					error : function(error){
+						alert('포인트 정보 업데이트 중 오류가 발생했습니다. 관리자에게 문의하여 주세요.');
 						return;
 					}
-				}
-			});
+				});
+			}	
 		}
 		
 	});
@@ -130,6 +186,10 @@ $(document).ready(function(){
 						alert(result.resultMessage);
 						return;
 					}
+				},
+				error : function(error){
+					alert('포인트 정보 업데이트 중 오류가 발생했습니다. 관리자에게 문의하여 주세요.');
+					return;
 				}
 			});
 		}
@@ -325,7 +385,7 @@ function openMemberSmsSendPopup(){
 	window.open('${pageContext.request.contextPath}/member/memberSmsSendPopup.view?franchiseNum='+$('#franchiseNum').val()+'&searchKeyword='+$('#searchKeyword').val()+'&searchMonth='+$('#searchMonth').val()+'&sms=sms', popupTitle, 'width=765,height=450,toolbar=0,location=0, directories=0, status=0, menubar=0');
 }
 
-function openMemberSmsSendPopup(){
+function openMemberNoticeTalkSendPopup(){
 	var popupTitle = "memberNoticeTalkSendPopup" ;
 	window.open('${pageContext.request.contextPath}/member/memberNoticeTalkSendPopup.view?franchiseNum='+$('#franchiseNum').val()+'&searchKeyword='+$('#searchKeyword').val()+'&searchMonth='+$('#searchMonth').val()+'&sms=sms', popupTitle, 'width=765,height=750,toolbar=0,location=0, directories=0, status=0, menubar=0');
 }

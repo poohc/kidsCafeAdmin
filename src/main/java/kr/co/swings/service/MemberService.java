@@ -153,14 +153,20 @@ public class MemberService {
 	 * @param paramMap
 	 * @return
 	 */
-	public JSONObject pointInfoUpdate(Map<String, Object> paramMap) {
+	public JSONObject pointInfoUpdate(Map<String, Object> paramMap, HttpServletRequest request) {
 		JSONObject result = new JSONObject();
 		result.put("resultCode", CommonConstants.RESULT_FAIL);
 		result.put("resultMessage", "회원정보 업데이트에 실패했습니다.");
 		
 		if(memberDao.pointInfoUpdate(paramMap) > 0) {
-			result.put("resultCode", CommonConstants.RESULT_SUCCESS);
-			result.put("resultMessage", "회원정보를 업데이트 했습니다.");
+			FranchiseInfoVo franchiseInfoVo = SessionUtil.getFranchiseInfoVo(request);
+			paramMap.put("device", "99");
+			paramMap.put("franchiseNum", franchiseInfoVo.getFranchiseeNum());
+			
+			if(memberDao.insertPointHits(paramMap) > 0) {
+				result.put("resultCode", CommonConstants.RESULT_SUCCESS);
+				result.put("resultMessage", "회원정보를 업데이트 했습니다.");
+			}
 		}
 		
 		return result;

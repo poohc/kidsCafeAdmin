@@ -220,8 +220,8 @@ $(document).ready(function(){
 							<a href="#excelDownload" onclick="searchExcelDownload();">
 								<i class="ico exl"></i>액셀로 내보내기
 							</a>
-							<button class="btn m lngy smsBtn" onclick="openMemberSmsSendPopup();">SMS전송</button>
-							<button class="btn m lngy" onclick="openMemberSmsSendPopup();">알림톡전송</button>
+							<button class="btn m lngy" onclick="openMemberSmsSendPopup();">SMS전송</button>
+							<button class="btn m lngy" onclick="openMemberNoticeTalkSendPopup();">알림톡전송</button>
 						</span>
 					</div>
 					<!-- pagingBox -->

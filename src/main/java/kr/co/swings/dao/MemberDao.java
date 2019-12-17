@@ -92,6 +92,11 @@ public class MemberDao {
 		return sqlSession.update(NS + "pointInfoUpdate", param);
 	}
 	
+	//포인트 이력 쌓기
+	public int insertPointHits(Map<String, Object> param){
+		return sqlSession.insert(NS + "insertPointHits", param);
+	}
+	
 	//MASTERInfo 삭제
 	public int deleteMasterInfoByMemberOut(Map<String, Object> param){
 		return sqlSession.delete(NS + "deleteMasterInfoByMemberOut", param);
