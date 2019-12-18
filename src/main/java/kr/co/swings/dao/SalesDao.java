@@ -24,6 +24,24 @@ public class SalesDao {
 	}
 	
 	/**
+	 * 시제금 집계
+	 * @param param
+	 * @return
+	 */
+	public List<Map<String, Object>> selectPettyCash(Map<String, Object> param) {
+		return sqlSession.selectList(NS + "selectPettyCash", param);
+	}
+	
+	/**
+	 * 집권할인 집계
+	 * @param param
+	 * @return
+	 */
+	public List<Map<String, Object>> selectExOfficioSale(Map<String, Object> param) {
+		return sqlSession.selectList(NS + "selectExOfficioSale", param);
+	}	
+	
+	/**
 	 * 당일방문 집계
 	 * @param param
 	 * @return

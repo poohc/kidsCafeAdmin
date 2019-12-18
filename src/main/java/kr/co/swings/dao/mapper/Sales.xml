@@ -61,6 +61,42 @@
 		       ) B
 	</select>
 	
+	<select id="selectPettyCash" parameterType="map" resultType="map">
+		SELECT WORKDATE,
+			   FRANCHISEENUM,
+			   FRANCHISEECODE,
+			   CASE WHEN POSNO = '1' THEN '매표'
+			        WHEN POSNO = '2' THEN '카페'
+			        ELSE '기타' END AS POSNAME,
+			   OPENPRICE,
+			   CLOSEPRICE
+		  FROM POSINFO
+		 WHERE WORKDATE = #{today}  
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+	</select>
+	
+	<select id="selectExOfficioSale" parameterType="map" resultType="map">
+		SELECT C.NAME,
+		       B.FRANCHISEENUM,
+		       C.PHONE,
+		       CASE WHEN CONVERT(INT,B.PRICE) <![CDATA[<]]> 0 THEN CONVERT(INT,B.PRICE) * -1
+            		ELSE CONVERT(INT,B.PRICE) END AS PRICE,
+		       B.GOODSNAME,
+		       B.MEMO
+		  FROM GOODSSALEINFO B,
+		       MASTERINFO C 
+		 WHERE B.MCODE = C.MCODE
+		   AND LEFT(B.INDATE,8) = #{today}
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   AND B.FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		   AND B.CANCELFLAG = '0'
+		   AND B.GOODSKIND1 = '0'
+		   AND B.GOODSKIND2 = '6'
+	</select>
+	
 	<select id="selectVisitInfo" parameterType="map" resultType="map">
 		SELECT A.FRANCHISEENUM,
 		       (SELECT LOCALNAME FROM FRANCHISEEINFO WHERE FRANCHISEEINFO.FRANCHISEENUM = A.FRANCHISEENUM) LOCAL_NAME,
@@ -685,6 +721,9 @@
 		   </if>	   
 		   <if test="radioSearch != null and (radioSearch eq 'customCancel'.toString())">
 		   AND CANCEL = '2'
+		   </if>
+		   <if test="approvalNum != null and approvalNum != ''">	
+		   AND RS09 LIKE  '%' + #{approvalNum} + '%'
 		   </if>
 		   <if test="searchKeyword != null and searchKeyword != ''">
 	       AND (MCODE LIKE  '%' + #{searchKeyword} + '%'  OR NAME LIKE '%' + #{searchKeyword} + '%')

@@ -78,6 +78,7 @@ public class MemberService {
 		request.setAttribute("selectedFrachiseNum", pagingVo.getFranchiseNum());
 		request.setAttribute("searchKeyword", pagingVo.getSearchKeyword());
 		request.setAttribute("searchMonth", pagingVo.getSearchMonth());
+		request.setAttribute("totalCount", totalCount);
 		
 		if(totalCount > 0) {
 			pageSb = PagingUtil.createPaging(pagingVo, totalCount);

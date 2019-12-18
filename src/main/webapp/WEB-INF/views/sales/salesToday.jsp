@@ -156,7 +156,91 @@ $(document).ready(function(){
 					</table>
 				</div>
 				<br/><br/>
-
+				
+				<div class="dfTable">
+					<div class="tit_info2">
+						<h2>시제금정산</h2>
+					</div>
+					<table>
+						<colgroup>
+							<col width="150px;">
+							<col width="">
+							<col width="">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>POS 종류</th>
+								<th>시제금액</th>
+								<th>마감금액</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${not empty pettyCashList}">
+									<c:forEach items="${pettyCashList}" var="pettyCashList">
+									<tr>
+										<td>${pettyCashList.POSNAME}</td>
+										<td><fmt:formatNumber value="${pettyCashList.OPENPRICE}"   pattern="#,###" /></td>
+										<td><fmt:formatNumber value="${pettyCashList.CLOSEPRICE}"  pattern="#,###" /></td>
+									</tr>	
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+								<tr>
+									<td colspan="3">금일 시제금정산 내역이 없습니다.</td>
+								</tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
+				<br/><br/>
+				
+				<div class="dfTable">
+					<div class="tit_info2">
+						<h2>직권할인</h2>
+					</div>
+					<table>
+						<colgroup>
+							<col width="150px;">
+							<col width="">
+							<col width="">
+							<col width="">
+							<col width="">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>고객명</th>
+								<th>전화번호</th>
+								<th>할인금액</th>
+								<th>할인종류</th>
+								<th>메모</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${not empty exOffcioSaleList}">
+									<c:forEach items="${exOffcioSaleList}" var="exOffcioSaleList">
+									<tr>
+										<td>${exOffcioSaleList.NAME}</td>
+										<td>${exOffcioSaleList.PHONE}</td>
+										<td><fmt:formatNumber value="${exOffcioSaleList.PRICE}"   pattern="#,###" /></td>
+										<td>${exOffcioSaleList.GOODSNAME}</td>
+										<td>${exOffcioSaleList.MEMO}</td>
+									</tr>	
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+								<tr>
+									<td colspan="5">금일 직권할인 내역이 없습니다.</td>
+								</tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
+				<br/><br/>
+				
 				<div class="dfTable">
 					<div class="tit_info2">
 						<h2>당일방문 집계</h2>

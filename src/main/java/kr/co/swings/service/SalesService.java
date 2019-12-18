@@ -68,6 +68,8 @@ public class SalesService {
 		param.put("franchiseStatus", franchiseInfoVo.getFranchiseeStatus());
 		
 		request.setAttribute("salesInfo", salesDao.selectSalesInfo(param));
+		request.setAttribute("pettyCashList", salesDao.selectPettyCash(param));
+		request.setAttribute("exOffcioSaleList", salesDao.selectExOfficioSale(param));
 		request.setAttribute("visitInfo", salesDao.selectVisitInfo(param));
 		request.setAttribute("snsVisitInfo", salesDao.selectSnsVisitInfo(param));		
 		request.setAttribute("multiTicketSalesInfo", salesDao.selectMultiTicketSalesInfo(param));		
@@ -255,6 +257,7 @@ public class SalesService {
 		request.setAttribute("selectFranchiseNum", ObjectUtils.toString(paramMap.get("selectFranchiseNum"), ""));
 		request.setAttribute("searchKeyword", ObjectUtils.toString(paramMap.get("searchKeyword"), ""));
 		request.setAttribute("radioSearch", ObjectUtils.toString(paramMap.get("radioSearch"), "confirm"));
+		request.setAttribute("approvalNum", ObjectUtils.toString(paramMap.get("approvalNum"), ""));
 	}
 	
 	/**

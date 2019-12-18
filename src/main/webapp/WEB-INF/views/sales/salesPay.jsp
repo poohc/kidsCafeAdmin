@@ -188,6 +188,8 @@ function chk(obj){
 									</c:choose>										
 									<div class="selectCal">
 										<span> 
+											승인번호
+											<input type="text" id="approvalNum" name="approvalNum" value="${approvalNum}">
 											<input type="text" id="calendar" name="searchDate" value="${searchDate}">
 										</span>
 									</div>

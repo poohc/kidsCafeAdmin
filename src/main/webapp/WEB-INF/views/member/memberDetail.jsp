@@ -142,6 +142,7 @@
 						</tbody>
 					</table>
 				</div>
+				<br/><br/>
 				<!--  //dfTable  -->
 				<!--  dfTable  -->
 				<div class="dfTable">
@@ -167,6 +168,7 @@
 						</tbody>
 					</table>
 				</div>
+				<br/><br/>
 				<!--  //dfTable  -->
 				<!--  dfTable  -->
 				<div class="dfTable">
@@ -247,6 +249,7 @@
 						</span>
 					</div>
 				</div>
+				<br/><br/>
 				<!--  dfTable  -->
 				<div class="dfTable">
 					<div class="tit_info2">
@@ -283,6 +286,7 @@
 						</tbody>
 					</table>
 				</div>
+				<br/><br/>
 				<div class="dfTable">
 					<div class="tit_info2">
 						<h3 class="fl">매장이용정보 (소셜입장 시 요금은 각 소셜 커머스 업체 관리자로 확인)</h3>
@@ -324,6 +328,7 @@
 						</tbody>
 					</table>
 				</div>
+				<br/><br/>
 				<div class="dfTable">
 					<div class="tit_info2">
 						<h3 class="fl">다회권 보유정보 [10+1]이용권 ${fn:length(multiTicketList)}장</h3>
@@ -365,6 +370,7 @@
 						</tbody>
 					</table>
 				</div>
+				<br/><br/>
 				<!--  //dfTable  -->
 				<div class="dfTable bot">
 					<div class="fr">

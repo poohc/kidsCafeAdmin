@@ -136,9 +136,10 @@ $(document).ready(function(){
 					</c:otherwise>
 					</c:choose>
 				</div>
-
 				<!--  //searchBox -->
-
+				
+				<div style="font-weight: bold;margin-left: 10px;">회원 수 : <fmt:formatNumber value="${totalCount}" pattern="#,###" /></div><br/>
+					
 				<!--  dfTable  -->
 				<div class="dfTable">
 					<table>
