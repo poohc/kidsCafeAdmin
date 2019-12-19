@@ -245,6 +245,13 @@ function searchExcelDownload(){
 	$('#frm').submit();
 }
 
+function groupMemberExcelDownload(){
+	$('#franchiseNum').val($('#selectedFranchise').val());
+	$('#searchKeyword').val($('#searchKeyword').val());
+	$('#frm').attr('action','${pageContext.request.contextPath}/member/groupMemberExcelDownload.do');
+	$('#frm').submit();
+}
+
 function memberDetail(mCode, phone){
 	$('#mCode').val(mCode);
 	$('#phone').val(phone);

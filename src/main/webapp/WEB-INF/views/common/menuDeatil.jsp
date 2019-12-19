@@ -15,6 +15,11 @@
 				<span>회원검색</span>
 			</a>
 		</li>
+		<li <c:if test="${param.menuSelected eq 'group'}">class="on"</c:if>>
+			<a href="${pageContext.request.contextPath}/member/groupMemberList.view">
+				<span>단체회원리스트</span>
+			</a>
+		</li>
 	</ul>
 	</c:when>
 	<c:when test="${param.menuName eq 'salesMenu'}">

@@ -307,7 +307,25 @@ public class MemberService {
 	 * @param pagingVo
 	 * @return
 	 */
-	public SXSSFWorkbook createMemberExcelList(PagingVo pagingVo) {
+	public SXSSFWorkbook createMemberExcelList(PagingVo pagingVo, HttpServletRequest request) {
+		
+		FranchiseInfoVo vo = SessionUtil.getFranchiseInfoVo(request);
+		//어드민 계정이 아닌 가맹점주 계정일 경우 해당 가맹점 회원정보만 검색
+		pagingVo.setFranchiseStatus(vo.getFranchiseeStatus());
+		if(vo != null && "0".equals(vo.getFranchiseeStatus())) {
+			pagingVo.setFranchiseNum(vo.getFranchiseeNum());	
+		} else {
+			if(pagingVo.getFranchiseNum() != null) {
+				List<Map<String, Object>> franchiseMapList = memberDao.selectFranchiseList();
+				List<String> franchiseNumList = new ArrayList<String>();
+				for(Map<String, Object> franchiseMap : franchiseMapList) {
+					franchiseNumList.add(ObjectUtils.toString(franchiseMap.get("FranchiseeNum")));
+				}
+				pagingVo.setFranchiseNumList(franchiseNumList);
+			}
+		}
+		
+		logger.info("PAGINGVO : " + pagingVo.toString());
 		
 		List<Map<String, Object>> memberList = memberDao.selectMasterInfoExcelList(pagingVo);
 		SXSSFWorkbook workBook = new SXSSFWorkbook();
@@ -336,7 +354,23 @@ public class MemberService {
 	 * @param pagingVo
 	 * @return
 	 */
-	public SXSSFWorkbook createSearchMemberExcelList(PagingVo pagingVo) {
+	public SXSSFWorkbook createSearchMemberExcelList(PagingVo pagingVo, HttpServletRequest request) {
+		
+		FranchiseInfoVo vo = SessionUtil.getFranchiseInfoVo(request);
+		//어드민 계정이 아닌 가맹점주 계정일 경우 해당 가맹점 회원정보만 검색
+		pagingVo.setFranchiseStatus(vo.getFranchiseeStatus());
+		if(vo != null && "0".equals(vo.getFranchiseeStatus())) {
+			pagingVo.setFranchiseNum(vo.getFranchiseeNum());	
+		} else {
+			if(pagingVo.getFranchiseNum() != null) {
+				List<Map<String, Object>> franchiseMapList = memberDao.selectFranchiseList();
+				List<String> franchiseNumList = new ArrayList<String>();
+				for(Map<String, Object> franchiseMap : franchiseMapList) {
+					franchiseNumList.add(ObjectUtils.toString(franchiseMap.get("FranchiseeNum")));
+				}
+				pagingVo.setFranchiseNumList(franchiseNumList);
+			}
+		}
 		
 		List<Map<String, Object>> memberList = memberDao.selectSearchMasterInfoExcelList(pagingVo);
 		SXSSFWorkbook workBook = new SXSSFWorkbook();

@@ -13,7 +13,7 @@
 	<form id="frm" action="${pageContext.request.contextPath}/member/memberList.view" method="post">
 		<input type="hidden" id="currentPage" name="currentPage" value="${currentPage}">
 		<input type="hidden" id="franchiseNum" name="franchiseNum">
-	</form> 
+	</form>
 	<div class="wrapper" id="wrapper">
 		<!--  headerBox  -->
 		<jsp:include page="../common/top.jsp" />
@@ -28,13 +28,13 @@
 			<!--//leftMenu-->
 			<!--  contentSection  -->
 			<div class="contentSection">
-				<h2>회원리스트</h2>
+				<h2>단체회원리스트</h2>
 				<!--  searchBox -->
 				<div class="searchBox">
 					<!--menuBox-->
 					<c:import url="../common/menuDeatil.jsp">
 						<c:param name="menuName"     value="memberMenu" />
-						<c:param name="menuSelected" value="list" />
+						<c:param name="menuSelected" value="group" />
 					</c:import>
 					<!--//menuBox-->
 					<c:choose>
@@ -122,7 +122,7 @@
 				<div class="dffooterBox">
 					<div class="fl">
 						<span class="btn m lngr">
-							<a href="javascript:excelDownload();">
+							<a href="javascript:groupMemberExcelDownload();">
 								<i class="ico exl"></i>액셀로 내보내기
 							</a>
 						</span>

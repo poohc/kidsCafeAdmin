@@ -70,10 +70,13 @@ public class SalesController {
 	public ModelAndView excelDownload(@RequestParam Map<String, Object> paramMap, HttpServletRequest request, Model model) {
 		ModelAndView mav = new ModelAndView("excelDownloadView");
 		SXSSFWorkbook workbook = null;
-		String workBookName = "일매출엑셀";
+		String workBookName = "당일매출엑셀";
 		
-		if("daily".equals(String.valueOf(paramMap.get("salesType")))) {
-			workbook = salesService.createDailySalesExcelFile(request, paramMap);	
+		if("today".equals(String.valueOf(paramMap.get("salesType")))) {
+			workbook = salesService.createTodaySalesExcelFile(request, paramMap);	
+		} else if("daily".equals(String.valueOf(paramMap.get("salesType")))) {
+			workbook = salesService.createDailySalesExcelFile(request, paramMap);
+			workBookName = "일매출엑셀";
 		} else if("monthly".equals(String.valueOf(paramMap.get("salesType")))) {
 			workbook = salesService.createMonthlySalesExcelFile(request, paramMap);
 			workBookName = "월매출엑셀";

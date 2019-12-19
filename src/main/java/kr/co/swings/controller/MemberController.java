@@ -43,6 +43,7 @@ public class MemberController {
 	@RequestMapping(value = "memberList.view", method = {RequestMethod.GET, RequestMethod.POST})
 	public ModelAndView memberList(PagingVo pagingVo, HttpServletRequest request, HttpServletResponse response) {
 		ModelAndView mav = new ModelAndView();
+		pagingVo.setGroup("0");
 		memberService.selectMemberList(pagingVo, request);
 		mav.setViewName("/member/memberList");
 		return mav;
@@ -57,6 +58,7 @@ public class MemberController {
 	@RequestMapping(value = "memberSearch.view", method = {RequestMethod.GET, RequestMethod.POST})
 	public ModelAndView memberSearch(PagingVo pagingVo, HttpServletRequest request, HttpServletResponse response) {
 		ModelAndView mav = new ModelAndView();
+		pagingVo.setGroup("0");
 		memberService.selectMemberList(pagingVo, request);
 		mav.setViewName("/member/memberSearch");
 		return mav;
@@ -73,6 +75,22 @@ public class MemberController {
 		ModelAndView mav = new ModelAndView();
 		memberService.memberDetail(request);
 		mav.setViewName("/member/memberDetail");
+		return mav;
+	}
+	
+	/**
+	 * 단체 회원 리스트 
+	 * @param pagingVo
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "groupMemberList.view", method = {RequestMethod.GET, RequestMethod.POST})
+	public ModelAndView groupMemberList(PagingVo pagingVo, HttpServletRequest request, HttpServletResponse response) {
+		ModelAndView mav = new ModelAndView();
+		pagingVo.setGroup("1");
+		memberService.selectMemberList(pagingVo, request);
+		mav.setViewName("/member/groupMemberList");
 		return mav;
 	}
 	
@@ -244,9 +262,10 @@ public class MemberController {
 	 * @return
 	 */
 	@RequestMapping(value = "excelDownload.do", method = {RequestMethod.GET, RequestMethod.POST})
-	public ModelAndView excelDownload(PagingVo pagingVo, Model model) {
+	public ModelAndView excelDownload(PagingVo pagingVo, Model model, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("excelDownloadView");
-		SXSSFWorkbook workbook = memberService.createMemberExcelList(pagingVo);
+		pagingVo.setGroup("0");
+		SXSSFWorkbook workbook = memberService.createMemberExcelList(pagingVo, request);
 		model.addAttribute("workbookName", "회원리스트엑셀");
 		model.addAttribute("workbook", workbook);
 		return mav;
@@ -259,10 +278,27 @@ public class MemberController {
 	 * @return
 	 */
 	@RequestMapping(value = "searchExcelDownload.do", method = {RequestMethod.GET, RequestMethod.POST})
-	public ModelAndView searchExcelDownload(PagingVo pagingVo, Model model) {
+	public ModelAndView searchExcelDownload(PagingVo pagingVo, Model model, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("excelDownloadView");
-		SXSSFWorkbook workbook = memberService.createSearchMemberExcelList(pagingVo);
-		model.addAttribute("workbookName", "회원리스트엑셀");
+		pagingVo.setGroup("0");
+		SXSSFWorkbook workbook = memberService.createSearchMemberExcelList(pagingVo, request);
+		model.addAttribute("workbookName", "검색회원리스트엑셀");
+		model.addAttribute("workbook", workbook);
+		return mav;
+	}
+	
+	/**
+	 * 단체회원 엑셀다운로드 처리
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "groupMemberExcelDownload.do", method = {RequestMethod.GET, RequestMethod.POST})
+	public ModelAndView groupMemberExcelDownload(PagingVo pagingVo, Model model, HttpServletRequest request) {
+		ModelAndView mav = new ModelAndView("excelDownloadView");
+		pagingVo.setGroup("1");
+		SXSSFWorkbook workbook = memberService.createMemberExcelList(pagingVo, request);
+		model.addAttribute("workbookName", "단체회원리스트엑셀");
 		model.addAttribute("workbook", workbook);
 		return mav;
 	}

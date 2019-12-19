@@ -28,6 +28,12 @@
 		SELECT COUNT(*)
  		  FROM MASTERINFO
           <where>
+          	  <if test="group != null and (group eq '1'.toString())">	
+	          AND Status = 1
+          	  </if>
+          	  <if test="group != null and (group eq '0'.toString())">	
+	          AND ISNULL(Status, 0) != 1
+          	  </if>
           	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">	
 	          	  <if test="franchiseNum != null and franchiseNum != ''">
 	          	  AND FranchiseeNum = #{franchiseNum}
@@ -127,6 +133,12 @@
                        *
                   FROM MASTERINFO
                 <where>
+                	<if test="group != null and (group eq '1'.toString())">	
+			        AND Status = 1
+		          	</if>
+		          	<if test="group != null and (group eq '0'.toString())">	
+			        AND ISNULL(Status, 0) != 1
+		          	</if>
                 	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
 		                <if test="franchiseNum != null and franchiseNum != ''">
 			            AND FranchiseeNum = #{franchiseNum}
@@ -196,14 +208,65 @@
                 SELECT ROW_NUMBER() OVER(ORDER BY JOINDATE DESC) AS ROW_NUM,
                        *
                   FROM MASTERINFO
-                <where>
-	                <if test="franchiseNum != null and franchiseNum != ''">
-		            AND FranchiseeNum = #{franchiseNum}
-		            </if>	
-		            <if test="searchKeyword != null and searchKeyword != ''">
-				    AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
-				    </if>
-                </where>
+            <where>
+				<if test="group != null and (group eq '1'.toString())">
+					AND Status = 1
+				</if>
+				<if test="group != null and (group eq '0'.toString())">
+					AND ISNULL(Status, 0) != 1
+				</if>
+				<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+					<if test="franchiseNum != null and franchiseNum != ''">
+						AND FranchiseeNum = #{franchiseNum}
+					</if>
+				</if>
+				<if test="searchKeyword != null and searchKeyword != ''">
+					AND (Phone LIKE '%' + #{searchKeyword} + '%' OR Name LIKE '%' +
+					#{searchKeyword} + '%')
+				</if>
+				<if test="searchMonth != null and (searchMonth eq '3m'.toString())">
+					AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112)
+					and CONVERT(CHAR(8), GETDATE(), 112)
+					<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						AND EntFranchiseeCode = #{franchiseNum}
+					</if>
+					<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+						AND EntFranchiseeCode IN
+						<foreach collection="franchiseNumList" item="item"
+							index="index" separator="," open="(" close=")">
+							#{item}
+						</foreach>
+					</if>
+				</if>
+				<if test="searchMonth != null and (searchMonth eq '6m'.toString())">
+					AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-6, GETDATE()), 112)
+					and CONVERT(CHAR(8), GETDATE(), 112)
+					<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						AND EntFranchiseeCode = #{franchiseNum}
+					</if>
+					<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+						AND EntFranchiseeCode IN
+						<foreach collection="franchiseNumList" item="item"
+							index="index" separator="," open="(" close=")">
+							#{item}
+						</foreach>
+					</if>
+				</if>
+				<if test="searchMonth != null and (searchMonth eq '12m'.toString())">
+					AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-12, GETDATE()),
+					112) and CONVERT(CHAR(8), GETDATE(), 112)
+					<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						AND EntFranchiseeCode = #{franchiseNum}
+					</if>
+					<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+						AND EntFranchiseeCode IN
+						<foreach collection="franchiseNumList" item="item"
+							index="index" separator="," open="(" close=")">
+							#{item}
+						</foreach>
+					</if>
+				</if>
+			</where>
 			   ) AS A
         <where> 
            <if test="pageCount != null and pageCount != ''">
@@ -232,15 +295,66 @@
                 SELECT ROW_NUMBER() OVER(ORDER BY JOINDATE DESC) AS ROW_NUM,
                        *
                   FROM MASTERINFO
-				 <where>
-	                <if test="franchiseNum != null and franchiseNum != ''">
-		            AND FranchiseeNum = #{franchiseNum}
-		            </if>	
-		            <if test="searchKeyword != null and searchKeyword != ''">
-				    AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
-				    </if>
-                 </where>                  
-			   ) AS A
+			    <where>
+					<if test="group != null and (group eq '1'.toString())">
+						AND Status = 1
+					</if>
+					<if test="group != null and (group eq '0'.toString())">
+						AND ISNULL(Status, 0) != 1
+					</if>
+					<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						<if test="franchiseNum != null and franchiseNum != ''">
+							AND FranchiseeNum = #{franchiseNum}
+						</if>
+					</if>
+					<if test="searchKeyword != null and searchKeyword != ''">
+						AND (Phone LIKE '%' + #{searchKeyword} + '%' OR Name LIKE '%' +
+						#{searchKeyword} + '%')
+					</if>
+					<if test="searchMonth != null and (searchMonth eq '3m'.toString())">
+						AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112)
+						and CONVERT(CHAR(8), GETDATE(), 112)
+						<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+							AND EntFranchiseeCode = #{franchiseNum}
+						</if>
+						<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+							AND EntFranchiseeCode IN
+							<foreach collection="franchiseNumList" item="item"
+								index="index" separator="," open="(" close=")">
+								#{item}
+							</foreach>
+						</if>
+					</if>
+					<if test="searchMonth != null and (searchMonth eq '6m'.toString())">
+						AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-6, GETDATE()), 112)
+						and CONVERT(CHAR(8), GETDATE(), 112)
+						<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+							AND EntFranchiseeCode = #{franchiseNum}
+						</if>
+						<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+							AND EntFranchiseeCode IN
+							<foreach collection="franchiseNumList" item="item"
+								index="index" separator="," open="(" close=")">
+								#{item}
+							</foreach>
+						</if>
+					</if>
+					<if test="searchMonth != null and (searchMonth eq '12m'.toString())">
+						AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-12, GETDATE()),
+						112) and CONVERT(CHAR(8), GETDATE(), 112)
+						<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+							AND EntFranchiseeCode = #{franchiseNum}
+						</if>
+						<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+							AND EntFranchiseeCode IN
+							<foreach collection="franchiseNumList" item="item"
+								index="index" separator="," open="(" close=")">
+								#{item}
+							</foreach>
+						</if>
+					</if>
+				</where>
+				) AS A
         <where> 
            <if test="pageCount != null and pageCount != ''">
            AND ROW_NUM BETWEEN ((#{currentPage} - 1) * #{pageCount} + 1) AND (#{currentPage} * #{pageCount})

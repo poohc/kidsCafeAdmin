@@ -76,6 +76,12 @@ $(document).ready(function(){
    }
    
 });
+
+function salesTodayExcelDownload(){
+	$('#frm').attr('action','${pageContext.request.contextPath}/sales/excelDownload.do');
+	$('#frm').submit();
+}
+
 </script>
 </head>
 <body>
@@ -107,10 +113,16 @@ $(document).ready(function(){
 				<div class="dfTable">
 					<div class="tit_info2">
 						<form id="frm" action="${pageContext.request.contextPath}/sales/salesToday.view" method="post">
+						<input type="hidden" id="salesType" name="salesType" value="today">
 						<h2>
 							당일매출 <span>${year}년 ${month}월 ${date}일</span>
 							<div class="tred">* 일 결제내역에서 정산을 완료해야 매출액이 합산됩니다.</div>
 							<input type="text" id="calendar" name="searchDate" value="${searchDate}">
+							<span class="btn m lngr">
+								<a href="javascript:salesTodayExcelDownload();">
+									<i class="ico exl"></i>액셀로 내보내기
+								</a>
+							</span>
 						</h2>
 						</form>
 					</div>
@@ -149,90 +161,6 @@ $(document).ready(function(){
 								<c:otherwise>
 								<tr>
 									<td colspan="5">금일 매출이 없습니다.</td>
-								</tr>
-								</c:otherwise>
-							</c:choose>
-						</tbody>
-					</table>
-				</div>
-				<br/><br/>
-				
-				<div class="dfTable">
-					<div class="tit_info2">
-						<h2>시제금정산</h2>
-					</div>
-					<table>
-						<colgroup>
-							<col width="150px;">
-							<col width="">
-							<col width="">
-						</colgroup>
-						<thead>
-							<tr>
-								<th>POS 종류</th>
-								<th>시제금액</th>
-								<th>마감금액</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:choose>
-								<c:when test="${not empty pettyCashList}">
-									<c:forEach items="${pettyCashList}" var="pettyCashList">
-									<tr>
-										<td>${pettyCashList.POSNAME}</td>
-										<td><fmt:formatNumber value="${pettyCashList.OPENPRICE}"   pattern="#,###" /></td>
-										<td><fmt:formatNumber value="${pettyCashList.CLOSEPRICE}"  pattern="#,###" /></td>
-									</tr>	
-									</c:forEach>
-								</c:when>
-								<c:otherwise>
-								<tr>
-									<td colspan="3">금일 시제금정산 내역이 없습니다.</td>
-								</tr>
-								</c:otherwise>
-							</c:choose>
-						</tbody>
-					</table>
-				</div>
-				<br/><br/>
-				
-				<div class="dfTable">
-					<div class="tit_info2">
-						<h2>직권할인</h2>
-					</div>
-					<table>
-						<colgroup>
-							<col width="150px;">
-							<col width="">
-							<col width="">
-							<col width="">
-							<col width="">
-						</colgroup>
-						<thead>
-							<tr>
-								<th>고객명</th>
-								<th>전화번호</th>
-								<th>할인금액</th>
-								<th>할인종류</th>
-								<th>메모</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:choose>
-								<c:when test="${not empty exOffcioSaleList}">
-									<c:forEach items="${exOffcioSaleList}" var="exOffcioSaleList">
-									<tr>
-										<td>${exOffcioSaleList.NAME}</td>
-										<td>${exOffcioSaleList.PHONE}</td>
-										<td><fmt:formatNumber value="${exOffcioSaleList.PRICE}"   pattern="#,###" /></td>
-										<td>${exOffcioSaleList.GOODSNAME}</td>
-										<td>${exOffcioSaleList.MEMO}</td>
-									</tr>	
-									</c:forEach>
-								</c:when>
-								<c:otherwise>
-								<tr>
-									<td colspan="5">금일 직권할인 내역이 없습니다.</td>
 								</tr>
 								</c:otherwise>
 							</c:choose>
@@ -831,8 +759,93 @@ $(document).ready(function(){
 						</tbody>
 					</table>
 				</div>
+				<c:if test="${sessionScope.franchiseInfoVo.franchiseeStatus eq '0'}">
+				<div class="dfTable">
+					<div class="tit_info2">
+						<h2>시제금정산</h2>
+					</div>
+					<table>
+						<colgroup>
+							<col width="150px;">
+							<col width="">
+							<col width="">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>POS 종류</th>
+								<th>시제금액</th>
+								<th>마감금액</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${not empty pettyCashList}">
+									<c:forEach items="${pettyCashList}" var="pettyCashList">
+									<tr>
+										<td>${pettyCashList.POSNAME}</td>
+										<td><fmt:formatNumber value="${pettyCashList.OPENPRICE}"   pattern="#,###" /></td>
+										<td><fmt:formatNumber value="${pettyCashList.CLOSEPRICE}"  pattern="#,###" /></td>
+									</tr>	
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+								<tr>
+									<td colspan="3">금일 시제금정산 내역이 없습니다.</td>
+								</tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
+				<br/><br/>
 				
+				<div class="dfTable">
+					<div class="tit_info2">
+						<h2>직권할인</h2>
+					</div>
+					<table>
+						<colgroup>
+							<col width="150px;">
+							<col width="">
+							<col width="">
+							<col width="">
+							<col width="">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>고객명</th>
+								<th>전화번호</th>
+								<th>할인금액</th>
+								<th>할인종류</th>
+								<th>메모</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${not empty exOffcioSaleList}">
+									<c:forEach items="${exOffcioSaleList}" var="exOffcioSaleList">
+									<tr>
+										<td>${exOffcioSaleList.NAME}</td>
+										<td>${exOffcioSaleList.PHONE}</td>
+										<td><fmt:formatNumber value="${exOffcioSaleList.PRICE}"   pattern="#,###" /></td>
+										<td>${exOffcioSaleList.GOODSNAME}</td>
+										<td>${exOffcioSaleList.MEMO}</td>
+									</tr>	
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+								<tr>
+									<td colspan="5">금일 직권할인 내역이 없습니다.</td>
+								</tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
+				<br/><br/>
+				</c:if>
 			</div>
+			
 			<!--  //contentSection  -->
 			<!--  //contents-->
 		</div>

@@ -13,6 +13,7 @@ public class PagingVo {
 	String franchiseStatus;
 	String searchMonth;
 	List<String> franchiseNumList;
+	String group;
 	
 	public int getCurrentPage() {
 		return currentPage;
@@ -55,6 +56,12 @@ public class PagingVo {
 	}
 	public void setFranchiseNumList(List<String> franchiseNumList) {
 		this.franchiseNumList = franchiseNumList;
+	}
+	public String getGroup() {
+		return group;
+	}
+	public void setGroup(String group) {
+		this.group = group;
 	}
 	
 	@Override
