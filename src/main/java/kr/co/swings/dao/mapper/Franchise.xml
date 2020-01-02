@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.swings.franchise">
+	
+	<select id="selectFranchiseInfoList" parameterType="map" resultType="map">
+		SELECT LocalName,
+			   FaseName,
+			   BusinessNumber,
+			   Address,
+			   BusinessPaper,
+			   MasterName,
+			   MasterEmail,
+			   Phone,
+			   MasterPhone,
+			   JoinDate,
+			   Royalty,
+			   VANName,
+			   VANNum,
+			   FranchiseeNum,
+			   MasterPassword,
+			   FranchiseeStatus
+		  FROM FranchiseeInfo
+		<where>
+		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		</where> 
+		   
+	</select>
+	
+	<update id="updateFranchisePw" parameterType="map">
+		UPDATE FranchiseeInfo
+		   SET MasterPassword = #{changePw}
+		 WHERE FRANCHISEENUM = #{franchiseNum}   
+	</update>
+	
+	<select id="selectSmsSendStatByMonth" parameterType="map" resultType="map">
+		SELECT S.YYYYMM,
+		       S.SEND_TYPE,
+		       SUM(S.SEND_COUNT) SEND_COUNT,
+		       SUM(S.SEND_PAY) SEND_PAY
+		  FROM (
+		  		
+				SELECT CONVERT(CHAR(6), REGDATE, 112) YYYYMM,
+					   <![CDATA[	
+				       CASE WHEN SMSSENDCOUNT > 0 THEN 'SMS' 
+				            WHEN LMSSENDCOUNT > 0 THEN 'LMS'
+				            END AS SEND_TYPE,
+				       CASE WHEN SMSSENDCOUNT > 0 THEN SMSSENDCOUNT 
+				            WHEN LMSSENDCOUNT > 0 THEN LMSSENDCOUNT
+				            END AS SEND_COUNT,
+				       CASE WHEN SMSSENDCOUNT > 0 THEN SMSSENDCOUNT * 12.5 
+				            WHEN LMSSENDCOUNT > 0 THEN LMSSENDCOUNT * 44.8
+				            END AS SEND_PAY
+				       ]]>     
+				  FROM SENDSMSHISTORY 
+				<where>
+		   		   AND REGDATE BETWEEN CONVERT(DATE, CONVERT(VARCHAR(6), GETDATE(), 112) + '01') 
+		                           AND DATEADD(DAY, -1, CONVERT(DATE, CONVERT(VARCHAR(4), GETDATE(), 112) + '0201'))
+		   		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   		   AND FRANCHISEENUM = #{franchiseNum}
+				   </if>
+				</where>
+		       ) S  
+		GROUP BY S.YYYYMM, S.SEND_TYPE
+	</select>
+	
+	<select id="selectSmsSendList" parameterType="map" resultType="map">
+		SELECT TOP 20
+		       CONVERT(CHAR(6), REGDATE, 112) YYYYMM,
+		       CONTENTS,
+			   <![CDATA[	
+		       CASE WHEN SMSSENDCOUNT > 0 THEN 'SMS' 
+		            WHEN LMSSENDCOUNT > 0 THEN 'LMS'
+		            END AS SEND_TYPE,
+		       CASE WHEN SMSSENDCOUNT > 0 THEN SMSSENDCOUNT 
+		            WHEN LMSSENDCOUNT > 0 THEN LMSSENDCOUNT
+		            END AS SEND_COUNT,
+		       CASE WHEN SMSSENDCOUNT > 0 THEN SMSSENDCOUNT * 12.5 
+		            WHEN LMSSENDCOUNT > 0 THEN LMSSENDCOUNT * 44.8
+		            END AS SEND_PAY
+		       ]]>     
+		  FROM SENDSMSHISTORY 
+		<where>
+   		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+   		   AND FRANCHISEENUM = #{franchiseNum}
+		   </if>
+		</where>
+	</select>
+	
+	<select id="selectKakaoSendStatByMonth" parameterType="map" resultType="map">
+		SELECT S.YYYYMM, 
+		       S.SEND_TYPE,
+		       SUM(S.SEND_COUNT) SEND_COUNT,
+		       SUM(S.SEND_PAY) SEND_PAY
+		  FROM (
+				SELECT CONVERT(CHAR(6), REGDATE, 112) YYYYMM,
+				       '카카오알림톡' SEND_TYPE,
+				       KakaoTalkSendCount SEND_COUNT,
+				       (KakaoTalkSendCount * 11) SEND_PAY
+				  FROM SendKakaoHistory
+				<where>
+		   		   AND REGDATE BETWEEN CONVERT(DATE, CONVERT(VARCHAR(6), GETDATE(), 112) + '01') 
+		                           AND DATEADD(DAY, -1, CONVERT(DATE, CONVERT(VARCHAR(4), GETDATE(), 112) + '0201'))
+		   		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		   		   AND FRANCHISEENUM = #{franchiseNum}
+				   </if>
+			    </where>
+			   ) S
+		GROUP BY YYYYMM, SEND_TYPE
+	</select>
+	
+</mapper>

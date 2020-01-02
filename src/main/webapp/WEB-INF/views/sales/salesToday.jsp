@@ -123,6 +123,11 @@ function salesTodayExcelDownload(){
 									<i class="ico exl"></i>액셀로 내보내기
 								</a>
 							</span>
+							<span class="btn m lngr">
+							<a href="#print" onclick="screenPrint();">
+								<i class="ico print"></i>인쇄
+							</a>
+						</span>
 						</h2>
 						</form>
 					</div>

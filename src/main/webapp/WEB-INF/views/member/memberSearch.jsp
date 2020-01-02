@@ -87,6 +87,8 @@ $(document).ready(function(){
 									최근방문일
 									<select id="lastVisitMonth" name="lastVisitMonth">
 										<option value="">선택하세요</option>
+										<option value="1w"  <c:if test="${searchMonth eq '1w'}">selected="selected"</c:if>>1주일</option>
+										<option value="1m"  <c:if test="${searchMonth eq '1m'}">selected="selected"</c:if>>1개월</option>
 										<option value="3m"  <c:if test="${searchMonth eq '3m'}">selected="selected"</c:if>>3개월</option>
 										<option value="6m"  <c:if test="${searchMonth eq '6m'}">selected="selected"</c:if>>6개월</option>
 										<option value="12m" <c:if test="${searchMonth eq '12m'}">selected="selected"</c:if>>12개월</option>
@@ -124,6 +126,8 @@ $(document).ready(function(){
 									최근방문일
 									<select id="lastVisitMonth" name="lastVisitMonth">
 									    <option value="">선택하세요</option>
+									    <option value="1w"  <c:if test="${searchMonth eq '1w'}">selected="selected"</c:if>>1주일</option>
+										<option value="1m"  <c:if test="${searchMonth eq '1m'}">selected="selected"</c:if>>1개월</option>
 										<option value="3m"  <c:if test="${searchMonth eq '3m'}">selected="selected"</c:if>>3개월</option>
 										<option value="6m"  <c:if test="${searchMonth eq '6m'}">selected="selected"</c:if>>6개월</option>
 										<option value="12m" <c:if test="${searchMonth eq '12m'}">selected="selected"</c:if>>12개월</option>

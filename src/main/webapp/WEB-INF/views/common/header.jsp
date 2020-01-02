@@ -73,7 +73,11 @@ function clock() {
     minute = minute < 10 ? '0' + minute : minute;
     seconds = seconds < 10 ? '0' + seconds : seconds;
     
-    $('#full_date').text(year + '-' + (month+1) + '-' + day + ' ' + hour + ':' + minute + ':' + seconds);
+    if(month+1 < 10){
+    	month = '0' + (month + 1);
+    }
+    
+    $('#full_date').text(year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + seconds);
 }
 
 setInterval(clock, 1000);

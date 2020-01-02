@@ -84,6 +84,25 @@
 				</a>
 			</li>
 		</ul>
+	</c:when>
+	<c:when test="${param.menuName eq 'franchiseMenu'}">
+		<ul>
+			<li <c:if test="${param.menuSelected eq 'franchiseInfo'}">class="on"</c:if>>
+				<a href="${pageContext.request.contextPath}/franchise/franchiseInfo.view">
+					<span>매장현황</span>
+				</a>
+			</li>
+			<li <c:if test="${param.menuSelected eq 'smsCalc'}">class="on"</c:if>>
+				<a href="${pageContext.request.contextPath}/franchise/smsCalculate.view">
+					<span>문자발송정산</span>
+				</a>
+			</li>
+			<li <c:if test="${param.menuSelected eq 'kakaoCalc'}">class="on"</c:if>>
+				<a href="${pageContext.request.contextPath}/franchise/kakaoCalculate.view">
+					<span>알림톡정산</span>
+				</a>
+			</li>			
+		</ul>
 	</c:when> 
 	<c:otherwise>
 	</c:otherwise>

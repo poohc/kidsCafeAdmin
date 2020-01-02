@@ -42,6 +42,30 @@
           	  <if test="searchKeyword != null and searchKeyword != ''">
 		      AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
 		      </if>
+		      <if test="searchMonth != null and (searchMonth eq '1w'.toString())">
+		      	  AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(DD,-7, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		      	  AND EntFranchiseeCode = #{franchiseNum}
+		      	  </if>
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+			      	  AND EntFranchiseeCode IN
+			      	  <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+	                   #{item}
+	                  </foreach>
+		      	  </if>
+		      </if>
+		      <if test="searchMonth != null and (searchMonth eq '1m'.toString())">
+		      	  AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-1, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+		      	  AND EntFranchiseeCode = #{franchiseNum}
+		      	  </if>
+		      	  <if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+			      	  AND EntFranchiseeCode IN
+			      	  <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+	                   #{item}
+	                  </foreach>
+		      	  </if>
+		      </if>
 		      <if test="searchMonth != null and (searchMonth eq '3m'.toString())">
 		      	  AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
 		      	  <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
@@ -147,17 +171,41 @@
 		            <if test="searchKeyword != null and searchKeyword != ''">
 				    AND (Phone LIKE  '%' + #{searchKeyword} + '%'  OR Name LIKE '%' + #{searchKeyword} + '%')
 				    </if>
-				    <if test="searchMonth != null and (searchMonth eq '3m'.toString())">
-			      	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
-			      	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
-			      	AND EntFranchiseeCode = #{franchiseNum}
-			      	</if>
-			      	<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
-					    AND EntFranchiseeCode IN
+				    <if test="searchMonth != null and (searchMonth eq '1w'.toString())">
+			      	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(DD,-7, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+				      	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				      	AND EntFranchiseeCode = #{franchiseNum}
+				      	</if>
+				      	<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+					   	AND EntFranchiseeCode IN
 					    <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
 			            #{item}
 			            </foreach>
-			      	</if>
+				      	</if>
+				    </if>
+				    <if test="searchMonth != null and (searchMonth eq '1m'.toString())">
+				   	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-1, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+				      	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   		AND EntFranchiseeCode = #{franchiseNum}
+				      	</if>
+				      	<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+					  	AND EntFranchiseeCode IN
+					   	<foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+			            #{item}
+			            </foreach>
+				    	</if>
+				    </if>
+				    <if test="searchMonth != null and (searchMonth eq '3m'.toString())">
+			      	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-3, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
+				      	<if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				    	AND EntFranchiseeCode = #{franchiseNum}
+				      	</if>
+				      	<if test="franchiseStatus != null and (franchiseStatus eq '1'.toString())">
+					    AND EntFranchiseeCode IN
+					    <foreach collection="franchiseNumList" item="item" index="index" separator="," open="(" close=")">
+				        #{item}
+				        </foreach>
+				    	</if>
 			        </if>
 			        <if test="searchMonth != null and (searchMonth eq '6m'.toString())">
 			        	AND LastVisit BETWEEN CONVERT(CHAR(8), DATEADD(MM,-6, GETDATE()), 112) and CONVERT(CHAR(8), GETDATE(), 112)
@@ -663,13 +711,15 @@
 								   FranchiseeNum,
 								   SmsSendCount,
 								   LmsSendCount,
-								   RegDate
+								   RegDate,
+								   Contents
 								  )
 						   VALUES (
 						   		   #{franchiseNum},
 						   		   #{smsSendCount},
 						   		   #{lmsSendCount},
-						   		   GETDATE()	
+						   		   GETDATE(),
+						   		   #{contents}	
 						   		  ) 							  
 	</insert>
 	

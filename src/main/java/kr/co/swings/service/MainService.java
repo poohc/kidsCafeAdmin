@@ -47,6 +47,8 @@ public class MainService {
 		request.setAttribute("today", sdf.format(date));
 		request.setAttribute("requestList", boardDao.selectRequestBoardListLimitTen(param));
 		request.setAttribute("noticeList", boardDao.selectNoticeBoardListLimitTen());
+		request.setAttribute("salesInfoByMonth", mainDao.selectYearSalesInfoByMonth(param));
+		request.setAttribute("visitInfoByMonth", mainDao.selectYearVisitInfoByMonth(param));
 	}
 	
 }

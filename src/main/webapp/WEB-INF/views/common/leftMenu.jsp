@@ -84,6 +84,19 @@
 				</c:choose>
 			</a>
 		</li>
+		<li <c:if test="${param.menuName eq 'franchise'}">class="on"</c:if> id="goFranchise" style="cursor: pointer">
+			<a href="${pageContext.request.contextPath}/franchise/franchiseInfo.view">
+				매장현황
+				<c:choose>
+					<c:when test="${param.menuName eq 'franchise'}">
+					<i class="ico right">on</i>
+					</c:when>
+					<c:otherwise>
+					<i class="ico right">off</i>
+					</c:otherwise>
+				</c:choose>
+			</a>
+		</li>
 <!-- 		<li id="goVoc" style="cursor: pointer"> -->
 <!-- 			<a> -->
 <!-- 				고객의소리<i class="ico right">off</i> -->

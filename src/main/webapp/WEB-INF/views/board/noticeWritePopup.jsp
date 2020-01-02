@@ -121,7 +121,8 @@ $(function(){
 							<th>내용</th>
 						</tr>
 						<tr>
-							<td style="text-align: left;">${noticeInfo.Contents}</td>
+							<% pageContext.setAttribute("newLineChar", "\n"); %>
+							<td style="text-align: left;">${fn:replace(noticeInfo.Contents, newLineChar, "<br/>")}</td>
 						</tr>
 						<tr>
 							<th>게시일</th>

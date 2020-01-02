@@ -37,5 +37,42 @@
 				   AND LEFT(InDate, 8) = #{today}) SNS_COUNT
 	</select>
 	
+	<select id="selectYearSalesInfoByMonth" parameterType="map" resultType="map">
+		SELECT YYYYMM,
+               ISNULL(SUM(CONVERT(INT,A.CARD)),0) + ISNULL(SUM(CONVERT(INT, A.CASH)),0) TOTAL_SUM
+          FROM (
+		        SELECT LEFT(INDATE, 6) YYYYMM,
+		               CASE WHEN APPROVALKIND = '1' THEN SUMPRICE END AS CARD,
+		               CASE WHEN APPROVALKIND = '0' THEN SUMPRICE END AS CASH
+				  FROM PAYMENTINFO
+				 WHERE CANCELFLAG = '0'
+				   AND LEFT(INDATE, 8) BETWEEN CONVERT(CHAR(8), DATEADD(YEAR,-1, GETDATE()),112) AND CONVERT(CHAR(8),GETDATE(),112)
+		   		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FranchiseeNum = #{franchiseNum} 
+				   </if>
+		       ) A
+            GROUP BY YYYYMM
+	</select>
+	
+	<select id="selectYearVisitInfoByMonth" parameterType="map" resultType="map">
+		SELECT YYYYMM,
+               ISNULL(SUM(A.ADULT_COUNT),0) + ISNULL(SUM(A.KIDS_COUNT),0) + ISNULL(SUM(A.GROUP_COUNT),0) TOTAL_SUM 
+          FROM (
+				SELECT LEFT(INDATE, 6) YYYYMM,
+				       CASE WHEN CHARINDEX('아동입장', GOODSNAME) > 0 THEN NUM 
+				            ELSE 0 END AS KIDS_COUNT,
+				       CASE WHEN CHARINDEX('성인입장', GOODSNAME) > 0 THEN NUM 
+				            ELSE 0 END AS ADULT_COUNT,
+				       CASE WHEN CHARINDEX('단체', GOODSNAME) > 0 THEN NUM 
+				            ELSE 0 END AS GROUP_COUNT     
+				  FROM GOODSSALEINFO
+				 WHERE CANCELFLAG = '0'
+				   AND LEFT(INDATE, 8) BETWEEN CONVERT(CHAR(8), DATEADD(YEAR,-1, GETDATE()),112) AND CONVERT(CHAR(8),GETDATE(),112)
+				   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+				   AND FranchiseeNum = #{franchiseNum} 
+				   </if>
+               ) A
+            GROUP BY YYYYMM
+	</select>
 	
 </mapper>

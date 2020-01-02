@@ -94,7 +94,8 @@ $(document).ready( function() {
 						data : {
 							franchiseNum : $('#franchiseNum').val(),
 							smsSendCount : smsCnt,
-							lmsSendCount : lmsCnt
+							lmsSendCount : lmsCnt,
+							contents : $('#textContents').val()
 						},
 						success : function(result) {
 							if (result.resultCode == '00') {
