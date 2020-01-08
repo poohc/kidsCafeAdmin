@@ -128,9 +128,9 @@ var visitConfig = {
 
 window.onload = function() {
 	var salesCtx = document.getElementById('salesCanvas').getContext('2d');
-	var visitCtx = document.getElementById('visitCanvas').getContext('2d');
+// 	var visitCtx = document.getElementById('visitCanvas').getContext('2d');
 	window.myLine = new Chart(salesCtx, salesConfig);
-	window.myLine = new Chart(visitCtx, visitConfig);
+// 	window.myLine = new Chart(visitCtx, visitConfig);
 };
 </script>
 </head>
@@ -337,12 +337,12 @@ window.onload = function() {
 					<!--//inBox 오른쪽영역-->
 				</div>
 				
-				<div class="inSection twostage" style="width: 75%;height: 30%">
+				<div class="inSection twostage" style="width: 50%;height: 30%">
 					<canvas id="salesCanvas"></canvas>
 				</div>
-				<div class="inSection twostage" style="width: 75%;height: 30%">
-					<canvas id="visitCanvas"></canvas>
-				</div>
+<!-- 				<div class="inSection twostage" style="width: 50%;height: 30%"> -->
+<%-- 					<canvas id="visitCanvas"></canvas> --%>
+<!-- 				</div> -->
 				
 				<!--inBox-->
 				<!--  //contentSection  -->

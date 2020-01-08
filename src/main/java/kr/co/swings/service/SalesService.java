@@ -963,7 +963,11 @@ public class SalesService {
 				"null".equals(String.valueOf(paramMap.get("searchMonth")))) {
 			paramMap.put("yyyymm", yearMonth);
 		} else {
-			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + ObjectUtils.toString(paramMap.get("searchMonth"));
+			String searchMonth = ObjectUtils.toString(paramMap.get("searchMonth"));
+			if(searchMonth.length() == 1) {
+				searchMonth = "0" + searchMonth;
+			}
+			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + searchMonth;
 			paramMap.put("yyyymm", yearMonth);
 		}
 		
@@ -997,6 +1001,7 @@ public class SalesService {
         sheet.setColumnWidth(6, 9000);
         sheet.setColumnWidth(7, 9000);
         sheet.setColumnWidth(8, 9000);
+        sheet.setColumnWidth(9, 9000);
         
         //엑셀 스타일 설정
         Font headerFont = workbook.createFont();
@@ -1039,8 +1044,8 @@ public class SalesService {
 		
 		row = sheet.createRow(1);
 		
-		String[] headTitleArray = {"지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
-		String[] headTitleDbArray = {"LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
+		String[] headTitleArray = {"지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "현금영수증", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
+		String[] headTitleDbArray = {"LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "CASH_RECEIPT_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
 		
 		for(int i=0 ; i<headTitleArray.length; i++) {
 			cell = row.createCell(i);
@@ -1064,8 +1069,8 @@ public class SalesService {
 		
 		row = sheet.createRow(4 + monthSalesInfo.size());
 				
-		String[] bodyTitleArray = {"날짜", "지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
-		String[] bodyTitleDbArray = {"YYYYMMDD", "LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
+		String[] bodyTitleArray = {"날짜", "지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "현금영수증", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
+		String[] bodyTitleDbArray = {"YYYYMMDD", "LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "CASH_RECEIPT_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
 		
 		for(int i=0 ; i<bodyTitleArray.length; i++) {
 			cell = row.createCell(i);
@@ -1110,7 +1115,11 @@ public class SalesService {
 				"null".equals(String.valueOf(paramMap.get("searchMonth")))) {
 			paramMap.put("yyyymm", yearMonth);
 		} else {
-			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + ObjectUtils.toString(paramMap.get("searchMonth"));
+			String searchMonth = ObjectUtils.toString(paramMap.get("searchMonth"));
+			if(searchMonth.length() == 1) {
+				searchMonth = "0" + searchMonth;
+			}
+			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + searchMonth;
 			paramMap.put("yyyymm", yearMonth);
 		}
 		
@@ -1135,6 +1144,7 @@ public class SalesService {
         sheet.setColumnWidth(6, 9000);
         sheet.setColumnWidth(7, 9000);
         sheet.setColumnWidth(8, 9000);
+        sheet.setColumnWidth(9, 9000);
         
         //엑셀 스타일 설정
         Font headerFont = workbook.createFont();
@@ -1176,8 +1186,8 @@ public class SalesService {
 		cell.setCellValue(searchYear + "년 " + searchMonth + "월 " + localName + " 매출");
 		
 		row = sheet.createRow(1);
-		String[] headTitleArray = {"지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
-		String[] headTitleDbArray = {"LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
+		String[] headTitleArray = {"지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "현금영수증", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
+		String[] headTitleDbArray = {"LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "CASH_RECEIPT_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
 		
 		for(int i=0 ; i<headTitleArray.length; i++) {
 			cell = row.createCell(i);
@@ -1201,8 +1211,8 @@ public class SalesService {
 		
 		row = sheet.createRow(4 + monthSalesInfo.size());
 				
-		String[] bodyTitleArray = {"월", "지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
-		String[] bodyTitleDbArray = {"YYYYMM", "LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
+		String[] bodyTitleArray = {"월", "지점", "소셜매출", "F&B", "MD상품", "신용카드", "현금", "현금영수증", "입장객 수", "매출합계(소셜매출+신용카드+현금)"};  
+		String[] bodyTitleDbArray = {"YYYYMM", "LOCAL_NAME", "ENTERENCE_FEE_SUM", "FANDB_FEE_SUM", "MD_FEE_SUM", "CREDIT_CARD_SUM", "CASH_SUM", "CASH_RECEIPT_SUM", "ENTERENCE_COUNT_SUM", "TOTAL_SUM"};
 		
 		for(int i=0 ; i<bodyTitleArray.length; i++) {
 			cell = row.createCell(i);

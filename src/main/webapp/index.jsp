@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>:::큐브관리자:::</title>
+<title>키즈코리아 관리자</title>
 </head>
 
 <body>

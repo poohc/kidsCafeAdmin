@@ -113,6 +113,7 @@ function createExcel(){
 								<th>MD상품</th>
 								<th>신용카드</th>
 								<th>현금</th>
+								<th>현금영수증</th>
 								<th>입장객 수</th>
 								<th>매출합계(소셜매출+신용카드+현금)</th>
 							</tr>
@@ -128,6 +129,7 @@ function createExcel(){
 									<td><fmt:formatNumber value="${monthSalesInfo.MD_FEE_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesInfo.CREDIT_CARD_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesInfo.CASH_SUM}" pattern="#,###" /></td>
+									<td><fmt:formatNumber value="${monthSalesInfo.CASH_RECEIPT_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesInfo.ENTERENCE_COUNT_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesInfo.TOTAL_SUM}" pattern="#,###" /></td>
 								</tr>
@@ -135,7 +137,7 @@ function createExcel(){
 								</c:when>
 								<c:otherwise>
 								<tr>
-									<td colspan="8">월 매출 데이터가 없습니다.</td>
+									<td colspan="9">월 매출 데이터가 없습니다.</td>
 								</tr>
 								</c:otherwise>
 							</c:choose>
@@ -179,6 +181,7 @@ function createExcel(){
 								<th>MD상품</th>
 								<th>신용카드</th>
 								<th>현금</th>
+								<th>현금영수증</th>
 								<th>입장객 수</th>
 								<th>매출합계(소셜매출+신용카드+현금)</th>
 							</tr>
@@ -195,6 +198,7 @@ function createExcel(){
 									<td><fmt:formatNumber value="${monthSalesList.MD_FEE_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesList.CREDIT_CARD_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesList.CASH_SUM}" pattern="#,###" /></td>
+									<td><fmt:formatNumber value="${monthSalesList.CASH_RECEIPT_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesList.ENTERENCE_COUNT_SUM}" pattern="#,###" /></td>
 									<td><fmt:formatNumber value="${monthSalesList.TOTAL_SUM}" pattern="#,###" /></td>
 								</tr>
@@ -202,7 +206,7 @@ function createExcel(){
 								</c:when>
 								<c:otherwise>
 								<tr>
-									<td colspan="9">월 매출 데이터가 없습니다.</td>
+									<td colspan="10">월 매출 데이터가 없습니다.</td>
 								</tr>
 								</c:otherwise>
 							</c:choose>				
