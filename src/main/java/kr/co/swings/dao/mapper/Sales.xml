@@ -495,8 +495,12 @@
 						       SUM(CONVERT(INT, SUMPRICE)) CASH_RECEIPT_SUM
 						  FROM PAYMENTINFO 
 						 WHERE CANCELFLAG = '0' 
-						   AND LEFT(INDATE,6) = '202001'
-						   AND FRANCHISEENUM = '2053355'
+						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
+						   AND FRANCHISEENUM = #{franchiseNum}
+						   </if>
+						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
+						   AND FRANCHISEENUM = #{selectFranchiseNum}
+						   </if>
 						   AND (APPROVALKIND = 2 OR APPROVALKIND = 3) 
 					  GROUP BY LEFT(INDATE,6), FRANCHISEENUM   
 				       ) D

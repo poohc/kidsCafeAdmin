@@ -116,7 +116,11 @@ public class SalesService {
 				"null".equals(String.valueOf(paramMap.get("searchMonth")))) {
 			paramMap.put("yyyymm", yearMonth);
 		} else {
-			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + ObjectUtils.toString(paramMap.get("searchMonth"));
+			String searchMonth = ObjectUtils.toString(paramMap.get("searchMonth"));
+			if(searchMonth.length() == 1) {
+				searchMonth = "0" + searchMonth;
+			}
+			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + searchMonth;
 			paramMap.put("yyyymm", yearMonth);
 		}
 		
@@ -180,7 +184,11 @@ public class SalesService {
 				"null".equals(String.valueOf(paramMap.get("searchMonth")))) {
 			paramMap.put("yyyymm", yearMonth);
 		} else {
-			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + ObjectUtils.toString(paramMap.get("searchMonth"));
+			String searchMonth = ObjectUtils.toString(paramMap.get("searchMonth"));
+			if(searchMonth.length() == 1) {
+				searchMonth = "0" + searchMonth;
+			}
+			yearMonth = ObjectUtils.toString(paramMap.get("searchYear")) + searchMonth;
 			paramMap.put("yyyymm", yearMonth);
 		}
 		
