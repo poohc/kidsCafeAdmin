@@ -774,11 +774,13 @@ function salesTodayExcelDownload(){
 							<col width="150px;">
 							<col width="">
 							<col width="">
+							<col width="">
 						</colgroup>
 						<thead>
 							<tr>
 								<th>POS 종류</th>
 								<th>시제금액</th>
+								<th>현금</th>
 								<th>마감금액</th>
 							</tr>
 						</thead>
@@ -789,13 +791,14 @@ function salesTodayExcelDownload(){
 									<tr>
 										<td>${pettyCashList.POSNAME}</td>
 										<td><fmt:formatNumber value="${pettyCashList.OPENPRICE}"   pattern="#,###" /></td>
+										<td><fmt:formatNumber value="${pettyCashList.CASH}"        pattern="#,###" /></td>
 										<td><fmt:formatNumber value="${pettyCashList.CLOSEPRICE}"  pattern="#,###" /></td>
 									</tr>	
 									</c:forEach>
 								</c:when>
 								<c:otherwise>
 								<tr>
-									<td colspan="3">금일 시제금정산 내역이 없습니다.</td>
+									<td colspan="4">금일 시제금정산 내역이 없습니다.</td>
 								</tr>
 								</c:otherwise>
 							</c:choose>

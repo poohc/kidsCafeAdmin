@@ -65,19 +65,33 @@
 	</select>
 	
 	<select id="selectPettyCash" parameterType="map" resultType="map">
-		SELECT WORKDATE,
-			   FRANCHISEENUM,
-			   FRANCHISEECODE,
-			   CASE WHEN POSNO = '1' THEN '매표'
-			        WHEN POSNO = '2' THEN '카페'
+		SELECT A.WORKDATE,
+			   A.FRANCHISEENUM,
+			   A.FRANCHISEECODE,
+			   CASE WHEN A.POSNO = '1' THEN '매표'
+			        WHEN A.POSNO = '2' THEN '카페'
 			        ELSE '기타' END AS POSNAME,
-			   OPENPRICE,
-			   CLOSEPRICE
-		  FROM POSINFO
-		 WHERE WORKDATE = #{today}  
+			   A.OPENPRICE,
+			   A.CLOSEPRICE,
+			   SUM(CONVERT(INT,B.SUMPRICE)) CASH
+		  FROM POSINFO A LEFT OUTER JOIN
+		       (SELECT *  
+			     FROM PAYMENTINFO
+			    WHERE CANCELFLAG = '0'
+			      AND APPROVALKIND IN ('0','2','3')) B  
+			   ON A.FRANCHISEENUM = B.FRANCHISEENUM   
+			  AND A.POSNO = B.POSNO
+			  AND A.WORKDATE = LEFT(B.INDATE,8)
+		 WHERE A.WORKDATE = #{today}
 		   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
-		   AND FRANCHISEENUM = #{franchiseNum}
+		   AND A.FRANCHISEENUM = #{franchiseNum}
 		   </if>
+      GROUP BY A.WORKDATE,
+			   A.FRANCHISEENUM,
+			   A.FRANCHISEECODE,
+			   A.POSNO,
+			   A.OPENPRICE,
+			   A.CLOSEPRICE	   
 	</select>
 	
 	<select id="selectExOfficioSale" parameterType="map" resultType="map">
@@ -418,8 +432,8 @@
 		       AA.ENTERENCE_COUNT_SUM,
 	           B.CASH_SUM,
 	           C.CREDIT_CARD_SUM,
-	           D.CASH_RECEIPT_SUM,
-	           AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM + D.CASH_RECEIPT_SUM TOTAL_SUM
+	           ISNULL(D.CASH_RECEIPT_SUM,0) CASH_RECEIPT_SUM,
+	           AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM + ISNULL(D.CASH_RECEIPT_SUM,0) TOTAL_SUM
 	      FROM (
 			    SELECT A.YYYYMM,
 					   A.LOCAL_NAME,	
@@ -494,14 +508,15 @@
 						       FRANCHISEENUM,
 						       SUM(CONVERT(INT, SUMPRICE)) CASH_RECEIPT_SUM
 						  FROM PAYMENTINFO 
-						 WHERE CANCELFLAG = '0' 
+						 WHERE CANCELFLAG = '0'
+						   AND LEFT(INDATE,6) = #{yyyymm} 
 						   <if test="franchiseStatus != null and (franchiseStatus eq '0'.toString())">
 						   AND FRANCHISEENUM = #{franchiseNum}
 						   </if>
 						   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
 						   AND FRANCHISEENUM = #{selectFranchiseNum}
 						   </if>
-						   AND (APPROVALKIND = 2 OR APPROVALKIND = 3) 
+						   AND APPROVALKIND IN (2,3) 
 					  GROUP BY LEFT(INDATE,6), FRANCHISEENUM   
 				       ) D
          WHERE AA.YYYYMM = B.YYYYMM
@@ -521,8 +536,8 @@
 			   AA.ENTERENCE_COUNT_SUM,
 			   B.CASH_SUM,
 			   C.CREDIT_CARD_SUM,
-			   D.CASH_RECEIPT_SUM,
-			   AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM + D.CASH_RECEIPT_SUM TOTAL_SUM
+			   ISNULL(D.CASH_RECEIPT_SUM,0) CASH_RECEIPT_SUM,
+			   AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM + ISNULL(D.CASH_RECEIPT_SUM,0) TOTAL_SUM
 		  FROM (
 				SELECT A.YYYYMMDD,
 				       A.FRANCHISEENUM,
@@ -605,7 +620,7 @@
 				   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
 				   AND FRANCHISEENUM = #{selectFranchiseNum}
 				   </if>
-				   AND (APPROVALKIND = 2 OR APPROVALKIND = 3)
+				   AND APPROVALKIND IN (2,3)
 			  GROUP BY LEFT(INDATE,8), FRANCHISEENUM    		       
 		       ) D ON C.YYYYMMDD = D.YYYYMMDD AND C.FRANCHISEENUM = D.FRANCHISEENUM 
 		 WHERE AA.YYYYMMDD = B.YYYYMMDD
@@ -624,8 +639,8 @@
 			   AA.ENTERENCE_COUNT_SUM,
 			   B.CASH_SUM,
 			   C.CREDIT_CARD_SUM,
-			   D.CASH_RECEIPT_SUM,
-			   AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM + D.CASH_RECEIPT_SUM TOTAL_SUM
+			   ISNULL(D.CASH_RECEIPT_SUM, 0) CASH_RECEIPT_SUM,
+			   AA.ENTERENCE_FEE_SUM + B.CASH_SUM + C.CREDIT_CARD_SUM + ISNULL(D.CASH_RECEIPT_SUM, 0) TOTAL_SUM
 		  FROM (
 				SELECT A.YYYYMM,
 				       A.FRANCHISEENUM,
@@ -708,7 +723,7 @@
 				   <if test="selectFranchiseNum != null and selectFranchiseNum != ''">
 				   AND FRANCHISEENUM = #{selectFranchiseNum}
 				   </if>
-				   AND (APPROVALKIND = 2 OR APPROVALKIND = 3)
+				   AND APPROVALKIND IN (2,3)
 			  GROUP BY LEFT(INDATE,6), FRANCHISEENUM    		       
 		       ) D
 		 WHERE AA.YYYYMM = B.YYYYMM
