@@ -502,7 +502,7 @@
 						   </if>
 						   AND APPROVALKIND = 1
 					  GROUP BY LEFT(INDATE,6), FRANCHISEENUM   
-				       ) C,
+				       ) C LEFT OUTER JOIN
 				       (
 				       SELECT  LEFT(INDATE,6) YYYYMM,
 						       FRANCHISEENUM,
@@ -518,13 +518,11 @@
 						   </if>
 						   AND APPROVALKIND IN (2,3) 
 					  GROUP BY LEFT(INDATE,6), FRANCHISEENUM   
-				       ) D
+				       ) D ON C.YYYYMM = D.YYYYMM AND C.FRANCHISEENUM = D.FRANCHISEENUM
          WHERE AA.YYYYMM = B.YYYYMM
            AND B.YYYYMM = C.YYYYMM
-           AND C.YYYYMM = D.YYYYMM
            AND AA.FRANCHISEENUM = B.FRANCHISEENUM
-           AND B.FRANCHISEENUM = C.FRANCHISEENUM   
-           AND C.FRANCHISEENUM = D.FRANCHISEENUM
+           AND B.FRANCHISEENUM = C.FRANCHISEENUM
 	</select>
 	
 	<select id="selectMonthSalesListByDate" parameterType="map" resultType="map">
